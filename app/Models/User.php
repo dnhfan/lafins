@@ -29,21 +29,72 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    
+
+    /**
+     * The attributes that should be hidden for serialization.
+     * Added common two-factor fields so they won't be exposed by APIs.
+     *
+     * @var list<string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+     /**
+     * Relationships
+     */
+    
+    // 1. User có nhiều thu nhập (incomes)
+    public function incomes()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Income::class);
+    }
+
+    // 2. User có nhiều chi tiêu (outcomes)  
+    public function outcomes()
+    {
+        return $this->hasMany(Outcome::class);
+    }
+
+    // 3. User có nhiều hũ tiền (jars)
+    public function jars()
+    {
+        return $this->hasMany(Jar::class);
+    }
+
+    /**
+     * Helper methods
+     */
+    
+    // Lấy tổng thu nhập
+    public function getTotalIncomeAttribute()
+    {
+        return $this->incomes()->sum('amount');
+    }
+    
+    // Lấy tổng chi tiêu
+    public function getTotalOutcomeAttribute()
+    {
+        return $this->outcomes()->sum('amount');
+    }
+    
+    // Lấy số dư tổng trong tất cả các hũ
+    public function getTotalJarBalanceAttribute()
+    {
+        return $this->jars()->sum('balance');
     }
 }
