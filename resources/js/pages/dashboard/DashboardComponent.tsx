@@ -9,6 +9,7 @@ import TotalBalance from './TotalBalance';
 import JarList from './JarList';
 import JarDistributionPie from './JarDistributionPie';
 import IncomeOutcomeBar from './IcomeOutcomeBar';
+import FillterBox from './FillterBox';
 
 export {
 	TotalOutcome,
@@ -17,6 +18,7 @@ export {
 	JarList,
 	JarDistributionPie,
 	IncomeOutcomeBar,
+	FillterBox
 };
 
 // Default grouped export (optional convenience)
@@ -27,4 +29,5 @@ export default {
 	JarList,
 	JarDistributionPie,
 	IncomeOutcomeBar,
+	FillterBox
 };
