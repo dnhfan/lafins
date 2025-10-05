@@ -1,8 +1,7 @@
-export default function Totaloutcome() {
-    
+export default function TotalOutcome({className}) {
     return (
         <>
-        <p>outcome</p> 
+            <p>outcome</p>
         </>
-    )
+    );
 }

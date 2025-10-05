@@ -1,4 +1,4 @@
-export default function TotalBalance() {
+export default function TotalBalance({className}) {
     
     return (
         <>
