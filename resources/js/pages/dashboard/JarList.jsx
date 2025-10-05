@@ -1,34 +1,22 @@
 function JarBox({ children }) {
     return (
-        <div style={{
-            flex: '1 1 0',
-            minWidth: 0,
-            padding: '12px',
-            border: '1px solid #e2e8f0',
-            borderRadius: 8,
-            background: '#fff',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-            textAlign: 'center'
-        }}>
-            <p style={{ margin: 0 }}>{children ?? 'box'}</p>
+        <div className="h-full p-3 border border-gray-200 rounded-lg bg-white shadow-sm text-center flex items-center justify-center">
+            <p className="m-0">{children ?? 'box'}</p>
         </div>
     )
 }
 
-export default function JarList() {
+export default function JarList({ className }) {
+    const containerClass = `${className ?? ''} grid grid-cols-1 sm:grid-cols-3 md:grid-cols-6 gap-4 items-stretch`;
+
     return (
-        <div style={{
-            display: 'flex',
-            gap: 16,
-            alignItems: 'stretch'
-        }}>
+        <div className={containerClass}>
             <JarBox>Jar 1</JarBox>
             <JarBox>Jar 2</JarBox>
             <JarBox>Jar 3</JarBox>
             <JarBox>Jar 4</JarBox>
             <JarBox>Jar 5</JarBox>
             <JarBox>Jar 6</JarBox>
-            <JarBox>Jar 7</JarBox>
         </div>
     )
 }
