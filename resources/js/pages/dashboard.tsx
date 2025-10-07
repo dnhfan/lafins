@@ -2,6 +2,8 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 import {TotalBalance, TotalIncome, TotalOutcome, JarDistributionPie, IncomeOutcomeBar, JarList, FillterBox} from './dashboard/DashboardComponent';
 
@@ -13,6 +15,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
+    const { props } = usePage();
+
+    // Log controller-passed data to the browser console when navigating to Dashboard
+    useEffect(() => {
+        // Narrow log to relevant keys for readability, but also include full props
+        console.groupCollapsed && console.groupCollapsed('Dashboard props');
+        console.log('full props:', props);
+        console.log('summary:', props.summary);
+        console.log('jars:', props.jars);
+        console.log('jar_meta:', props.jar_meta);
+        console.groupEnd && console.groupEnd();
+    }, [props]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -22,18 +36,20 @@ export default function Dashboard() {
                 <FillterBox className = "flex" />
 
                 {/* Sumary */}
-                <div id='sumary' className="relative flex-[2] min-h-[30vh] overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <div className="grid auto-rows-min gap-4 md:grid-cols-3 p-4 h-full">
-                        <div className="relative h-full overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <TotalBalance className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                <div id='sumary' className="relative z-20 flex-none overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+
+                    <div className="grid auto-rows-auto gap-4 md:grid-cols-3 p-4">
+                        <div className="card-default">
+                            <TotalBalance />
                         </div>
-                        <div className="relative h-full overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <TotalIncome className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                        <div className="card-default">
+                            <TotalIncome />
                         </div>
-                        <div className="relative h-full overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <TotalOutcome className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                        <div className="card-default">
+                            <TotalOutcome />
                         </div>
                     </div>
+
                 </div>
 
                 {/* chart: split into two columns (left: pie, right: income/outcome) */}

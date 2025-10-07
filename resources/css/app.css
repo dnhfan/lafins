@@ -141,3 +141,11 @@
         @apply bg-background text-foreground;
     }
 }
+
+.card-default {
+  @apply relative w-full box-border h-auto overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border;
+}
+
+.circle-icon {
+    @apply w-12 h-12 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-700 dark:text-gray-300;
+}

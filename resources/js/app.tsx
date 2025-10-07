@@ -1,4 +1,6 @@
 import '../css/app.css';
+// Font Awesome (Webfont + CSS)  
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
