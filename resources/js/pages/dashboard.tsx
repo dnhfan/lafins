@@ -20,12 +20,16 @@ export default function Dashboard() {
     // Log controller-passed data to the browser console when navigating to Dashboard
     useEffect(() => {
         // Narrow log to relevant keys for readability, but also include full props
-        console.groupCollapsed && console.groupCollapsed('Dashboard props');
+        if (typeof console.groupCollapsed === 'function') {
+            console.groupCollapsed('Dashboard props');
+        }
         console.log('full props:', props);
         console.log('summary:', props.summary);
         console.log('jars:', props.jars);
         console.log('jar_meta:', props.jar_meta);
-        console.groupEnd && console.groupEnd();
+        if (typeof console.groupEnd === 'function') {
+            console.groupEnd();
+        }
     }, [props]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

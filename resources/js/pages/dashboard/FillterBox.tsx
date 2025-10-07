@@ -22,9 +22,9 @@ interface FillterBoxProps {
 
 export default function FillterBox({ className }: FillterBoxProps) {
     const { props } = usePage();
-    const filters = props?.filters ?? {};
+    const filters = props?.filters ?? {} as Record<string, string | undefined>;
 
-    function detectSelectedFromFilters(filters: { start?: string; end?: string; range?: string } | any) {
+    function detectSelectedFromFilters(filters: { start?: string; end?: string; range?: string } | Record<string, string | undefined>) {
         // If server gives a canonical range, trust it directly
         if (filters.range) {
             if (filters.range === 'day') return 'Day';
@@ -61,9 +61,7 @@ export default function FillterBox({ className }: FillterBoxProps) {
         setSelected(detectSelectedFromFilters(props?.filters ?? {}));
     }, [props?.filters]);
 
-    function formatDate(d: Date) {
-        return d.toISOString().slice(0, 10);
-    }
+
 
     function applyRange(start: string, end: string, name: string) {
         Inertia.get('/dashboard', { start, end }, { preserveState: false, replace: false });
