@@ -14,9 +14,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::firstOrCreate(
+        // Ensure a test user exists (idempotent)
+        $user = User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',
@@ -24,5 +23,17 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        // Run seeders that depend on a user being present. These seeders are idempotent
+        // or safe (use updateOrCreate/create) to avoid duplicates/conflicts.
+        // Run Income first so we can distribute received income into jars equally,
+        // then create jars (balances will be calculated from incomes - outcomes),
+        // and finally create outcomes which will consume from jars without allowing
+        // any jar to go negative.
+        $this->call([
+            IncomeSeeder::class,
+            JarSeeder::class,
+            OutcomeSeeder::class,
+        ]);
     }
 }
