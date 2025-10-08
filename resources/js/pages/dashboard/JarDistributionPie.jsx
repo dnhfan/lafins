@@ -1,5 +1,8 @@
 import { usePage } from "@inertiajs/react"
 import { useRef, useState, useEffect, useMemo } from 'react'
+import useResponsiveChartSize from '@/hooks/useResponsiveChartSize'
+import { createResponsiveOptions } from '@/lib/chartOptions'
+import { DEFAULT_PALETTE } from '@/lib/chartColors'
 import { Doughnut } from 'react-chartjs-2';
 import {
     Chart as ChartJs,
@@ -35,10 +38,10 @@ const buildChartData = (props) => {
     const values = items.map((it) => Number(it.balance ?? it.value ?? it.percentage ?? 0) || 0)
 
     // color
-    const backgroundColor = ['#FF9AA2', '#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA']
+    const backgroundColor = DEFAULT_PALETTE
 
-        // return -> data of chart
-        return {
+    // return -> data of chart
+    return {
             labels,
             datasets: [
                 {
@@ -136,45 +139,12 @@ export default function JarDistributionPie() {
     }
 
     // 3. caculate size for chart
-    // responsive sizing: measure parent width and clamp size so the chart remains readable
-    const containerRef = useRef(null) //useRef create a pointer point to a DOM 
-    const [size, setSize] = useState(320)
+    // responsive sizing: use shared hook to compute size and debounce
+    const containerRef = useRef(null)
+    const { size } = useResponsiveChartSize(containerRef, { min: 220, max: 420, scale: 0.9 })
 
-    useEffect(() => {
-        // cacu size
-        function updateSize() {
-            const parent = containerRef.current
-            if (!parent) return
-            const parentWidth = parent.clientWidth
-            // choose a chart size based on available width but clamp between 220 and 420
-            const computed = Math.round(Math.max(220, Math.min(420, parentWidth * 0.9)))
-            setSize(computed)
-        }
-        // change by size
-        updateSize()
-        const ro = new ResizeObserver(updateSize)
-        if (containerRef.current) ro.observe(containerRef.current)
-        window.addEventListener('resize', updateSize)
-        return () => {
-            ro.disconnect()
-            window.removeEventListener('resize', updateSize)
-        }
-    }, [])
-
-    // allow legend to move to bottom when container is narrow
-    const responsiveOptions = useMemo(() => {
-        const opts = { ...options }
-        try {
-            const parent = containerRef.current
-            const w = parent?.clientWidth ?? 800
-            if (w < 640) {
-                opts.plugins = { ...(opts.plugins || {}), legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8 } } }
-            }
-        } catch (e) {
-            // ignore
-        }
-        return opts
-    }, [size])
+    // allow legend to move to bottom when container is narrow (centralized helper)
+    const responsiveOptions = useMemo(() => createResponsiveOptions(options, containerRef, 640), [size])
 
     return (
         <div ref={containerRef} className="w-full p-4 bg-white rounded-lg shadow-sm">

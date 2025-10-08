@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useState, useMemo } from "react";
 import { usePage } from '@inertiajs/react';
 import { Bar } from 'react-chartjs-2';
+import useResponsiveChartSize from '@/hooks/useResponsiveChartSize'
+import { createResponsiveOptions } from '@/lib/chartOptions'
+import { INCOME_COLOR, OUTCOME_COLOR } from '@/lib/chartColors'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -27,12 +30,12 @@ const buildChartData = (props) => {
             {
                 label: ['Income'],  
                 data: [inc],
-                backgroundColor: ['#B5EAD7', ],
+                backgroundColor: [INCOME_COLOR, ],
             },
             {
                 label: ['OutCome'],  
                 data: [out],
-                backgroundColor: ['#FF6962', ],
+                backgroundColor: [OUTCOME_COLOR, ],
             }
         ]
     }
@@ -43,7 +46,7 @@ const baseOptions = {
     maintainAspectRatio: false,
     plugins: {
         legend: { position: 'top' },
-        title: { display: true, text: 'Income - Outcome' },
+        title: { display: true, text: 'Compare Income - OutCome with bar Chart' },
         tooltip: {
             callbacks: {
                 label: (context) => {
@@ -78,41 +81,11 @@ export default function IcomeOutcomeBar() {
         return <div className="text-sm text-slate-500">Không có dữ liệu hợp lệ để hiển thị biểu đồ</div>
     }
 
-    // 3. sizing / responsive legend 
+    // 3. sizing / responsive legend
     const containerRef = useRef(null)
-    const [size, setSize] = useState(320)
-
-    useEffect(() => {
-        function updateSize() {
-            const parent = containerRef.current
-            if (!parent) return
-            const parentWidth = parent.clientWidth
-            const computed = Math.round(Math.max(220, Math.min(720, parentWidth * 0.9)))
-            setSize(computed)
-        }
-        updateSize()
-        const ro = new ResizeObserver(updateSize)
-        if (containerRef.current) ro.observe(containerRef.current)
-        window.addEventListener('resize', updateSize)
-        return () => {
-            ro.disconnect()
-            window.removeEventListener('resize', updateSize)
-        }
-    }, [])
-
-    const responsiveOptions = useMemo(() => {
-        const opts = { ...baseOptions }
-        try {
-            const parent = containerRef.current
-            const w = parent?.clientWidth ?? 800
-            if (w < 640) {
-                opts.plugins = { ...(opts.plugins || {}), legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8 } } }
-            }
-        } catch (e) {
-            // ignore
-        }
-        return opts
-    }, [size])
+    // use shared hook to compute size (debounced, SSR safe)
+    const { size } = useResponsiveChartSize(containerRef, { min: 220, max: 720, scale: 0.9 })
+    const responsiveOptions = useMemo(() => createResponsiveOptions(baseOptions, containerRef, 640), [size])
 
     return (
         <div ref={containerRef} className="w-full p-4 bg-white rounded-lg shadow-sm">
