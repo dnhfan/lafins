@@ -41,3 +41,18 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Jar {
+  id: number;
+  key: string;
+  label: string // nếu backend không có, để optional
+  percentage: number
+  balance: number
+}
+
+// Page props for a page that includes jars payload.
+// Extend Record<string, unknown> so this type satisfies the usePage<T>() constraint
+export interface Jars extends Record<string, unknown> {
+    // Use lowercase 'jars' to match common backend payload naming; adjust if backend uses different key
+    jars?: Jar[];
+}
