@@ -9,7 +9,7 @@ export default function TotalOutcome({ className = 'w-full z-30' }) {
             <div className="p-4 relative z-40">
                 <div className="flex items-center space-x-4">
                     <div className="circle-icon">
-                        <i class="fa-solid fa-arrow-up"></i>
+                        <i className="fa-solid fa-arrow-up"></i>
                     </div>
                     <div>
                         <div className="text-sm text-muted-foreground">Outcome</div>
