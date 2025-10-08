@@ -38,28 +38,62 @@ class JarSeeder extends Seeder
         // Ensure total balance equals income - outcome (can be zero)
         $totalBalance = max(0, $totalIncome - $totalOutcome);
 
-        $jarCount = count($defaults);
+        // Allocate the total balance according to configured percentages.
+        // To avoid rounding errors, compute the floor allocation for each jar
+        // and distribute any remainder to jars with the largest fractional parts.
+        $allocations = [];
+        $fractionals = [];
+        $totalAllocated = 0;
 
-        // Distribute income equally across jars. Use integer division with rounding.
-        $equalShare = floor($totalBalance / $jarCount);
-        $remainder = $totalBalance - ($equalShare * $jarCount);
-
-        $i = 0;
-        foreach ($defaults as $name => $percent) {
-            // Give the remainder to the first few jars to ensure sum matches totalBalance
-            $allocated = $equalShare + ($i < $remainder ? 1 : 0);
-
-            // If equal allocation produced zero (very small total), fall back to percent-based allocation
-            if ($allocated <= 0) {
-                $allocated = (int) round(($totalBalance * $percent) / 100);
+        if ($totalBalance <= 0) {
+            // Nothing to allocate
+            foreach ($defaults as $name => $percent) {
+                $allocations[$name] = 0;
             }
+        } else {
+            // First pass: compute floor allocations and fractional parts
+            foreach ($defaults as $name => $percent) {
+                $floatAlloc = ($totalBalance * $percent) / 100;
+                $floorAlloc = (int) floor($floatAlloc);
+                $allocations[$name] = $floorAlloc;
+                $fractionals[$name] = $floatAlloc - $floorAlloc;
+                $totalAllocated += $floorAlloc;
+            }
+
+            // Distribute any remaining units to jars with highest fractional parts
+            $remainder = $totalBalance - $totalAllocated;
+            if ($remainder > 0) {
+                // Build a sortable list preserving original order for tie-breaking
+                $idx = 0;
+                $fracList = [];
+                foreach ($defaults as $name => $percent) {
+                    $fracList[] = ['name' => $name, 'fraction' => $fractionals[$name], 'index' => $idx++];
+                }
+
+                usort($fracList, function ($a, $b) {
+                    if ($a['fraction'] === $b['fraction']) {
+                        return $a['index'] <=> $b['index'];
+                    }
+                    return $b['fraction'] <=> $a['fraction'];
+                });
+
+                $i = 0;
+                while ($remainder > 0 && $i < count($fracList)) {
+                    $allocations[$fracList[$i]['name']]++;
+                    $remainder--;
+                    $i++;
+                }
+            }
+        }
+
+        // Persist jars with percent-based allocations
+        foreach ($defaults as $name => $percent) {
+            $allocated = $allocations[$name] ?? 0;
 
             Jar::updateOrCreate(
                 ['user_id' => $user->id, 'name' => $name],
                 ['percentage' => $percent, 'balance' => $allocated]
             );
-
-            $i++;
         }
     }
 }
