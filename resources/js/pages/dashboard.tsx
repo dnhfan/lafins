@@ -66,7 +66,7 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div className="flex items-center justify-center">
-                                <div className="w-full">
+                                <div className="w-full max-w-2x">
                                     <IncomeOutcomeBar />
                                 </div>
                             </div>
