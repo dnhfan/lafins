@@ -34,7 +34,7 @@ export default function Dashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 min-h-screen flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <main className="flex flex-1 flex-col gap-4 overflow-auto rounded-xl p-4">
 
                 {/* fillter box */}
                 <FillterBox className = "flex" />
@@ -75,12 +75,12 @@ export default function Dashboard() {
                 </div>
 
                 {/* Jar list */}
-                <div id='jarlist' className="relative flex-[2] min-h-[30vh] overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <div className="absolute inset-0 size-full overflow-auto p-4">
+                <div id='jarlist' className="overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
+                    <div className="size-full overflow-auto p-4">
                         <JarList className={"w-full h-full"} />
                     </div>
                 </div>
-            </div>
+            </main>
         </AppLayout>
     );
 }
