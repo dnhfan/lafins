@@ -141,10 +141,11 @@ export default function JarDistributionPie() {
     // 3. caculate size for chart
     // responsive sizing: use shared hook to compute size and debounce
     const containerRef = useRef(null)
-    const { size } = useResponsiveChartSize(containerRef, { min: 220, max: 420, scale: 0.9 })
+    const { size, measuredWidth } = useResponsiveChartSize(containerRef, { min: 220, max: 420, scale: 0.9 })
 
     // allow legend to move to bottom when container is narrow (centralized helper)
-    const responsiveOptions = useMemo(() => createResponsiveOptions(options, containerRef, 640), [size])
+    // we depend on measuredWidth so that when the wrapper grows back the options recompute
+    const responsiveOptions = useMemo(() => createResponsiveOptions(options, containerRef, 640), [size, measuredWidth])
 
     return (
         <div ref={containerRef} className="w-full p-4 bg-white rounded-lg shadow-sm">

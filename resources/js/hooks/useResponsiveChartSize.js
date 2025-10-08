@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react'
 export default function useResponsiveChartSize(containerRef, opts = {}) {
   const { min = 220, max = 720, scale = 0.9, debounceMs = 80 } = opts
   const [size, setSize] = useState(320)
+  const [measuredWidth, setMeasuredWidth] = useState(null)
 
   useEffect(() => {
     // SSR guard
@@ -27,6 +28,8 @@ export default function useResponsiveChartSize(containerRef, opts = {}) {
       const parent = containerRef?.current
       if (!parent) return
       const parentWidth = parent.clientWidth || 0
+      // store the raw measured width so callers can react to it even when size is clamped
+      setMeasuredWidth(parentWidth)
       const computed = Math.round(Math.max(min, Math.min(max, parentWidth * scale)))
       if (mounted) setSize(computed)
     }
@@ -64,5 +67,5 @@ export default function useResponsiveChartSize(containerRef, opts = {}) {
     }
   }, [containerRef, min, max, scale, debounceMs])
 
-  return { size }
+  return { size, measuredWidth }
 }

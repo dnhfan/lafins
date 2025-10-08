@@ -84,8 +84,8 @@ export default function IcomeOutcomeBar() {
     // 3. sizing / responsive legend
     const containerRef = useRef(null)
     // use shared hook to compute size (debounced, SSR safe)
-    const { size } = useResponsiveChartSize(containerRef, { min: 220, max: 720, scale: 0.9 })
-    const responsiveOptions = useMemo(() => createResponsiveOptions(baseOptions, containerRef, 640), [size])
+    const { size, measuredWidth } = useResponsiveChartSize(containerRef, { min: 220, max: 720, scale: 0.9 })
+    const responsiveOptions = useMemo(() => createResponsiveOptions(baseOptions, containerRef, 640), [size, measuredWidth])
 
     return (
         <div ref={containerRef} className="w-full p-4 bg-white rounded-lg shadow-sm">
