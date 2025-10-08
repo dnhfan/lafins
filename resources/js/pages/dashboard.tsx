@@ -57,16 +57,16 @@ export default function Dashboard() {
                 </div>
 
                 {/* chart: split into two columns (left: pie, right: income/outcome) */}
-                <div id='chart' className="relative flex-[4] overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <div className="absolute inset-0 size-full p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-                            <div className="relative h-full overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                                <div className="absolute inset-0 size-full">
+                <div id='chart' className="relative overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-[40vh] dark:border-sidebar-border">
+                    <div className="p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full items-center">
+                            <div className="flex items-center justify-center">
+                                <div className="w-full max-w-2xl">
                                     <JarDistributionPie />
                                 </div>
                             </div>
-                            <div className="relative h-full overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                                <div className="absolute inset-0 size-full">
+                            <div className="flex items-center justify-center">
+                                <div className="w-full">
                                     <IncomeOutcomeBar />
                                 </div>
                             </div>
