@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use \App\Http\Controllers\IncomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -8,7 +10,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('incomes', [IncomeController::class, 'index'])->name('incomes');
+    
 });
 
 require __DIR__.'/settings.php';
