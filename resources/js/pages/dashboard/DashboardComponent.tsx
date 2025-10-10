@@ -9,7 +9,7 @@ import TotalBalance from './TotalBalance';
 import JarList from './JarList';
 import JarDistributionPie from './JarDistributionPie';
 import IncomeOutcomeBar from './IcomeOutcomeBar';
-import FillterBox from './FillterBox';
+import FillterBox from '../../components/FilterBox';
 
 export {
 	TotalOutcome,

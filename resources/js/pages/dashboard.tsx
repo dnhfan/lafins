@@ -37,7 +37,7 @@ export default function Dashboard() {
             <main className="flex flex-1 flex-col gap-4 overflow-auto rounded-xl p-4">
 
                 {/* fillter box */}
-                <FillterBox className = "flex" />
+                <FillterBox className = "flex" endpoint='/dashboard'/>
 
                 {/* Sumary */}
                 <div id='sumary' className="relative z-20 flex-none overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
