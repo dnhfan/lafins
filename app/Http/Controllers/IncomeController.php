@@ -58,10 +58,10 @@ class IncomeController extends Controller
 
         // 7. pagination
         // số record mỗi trang
-    $perPage = (int) $request->input('per_page', 15);
+        $perPage = (int) $request->input('per_page', 15);
         
-    // apply a sensible default sort (newest first) and keep query string on paginator
-    $incomes = $query->latest()->paginate($perPage)->withQueryString();
+        // apply a sensible default sort (newest first) and keep query string on paginator
+        $incomes = $query->latest()->paginate($perPage)->withQueryString();
         // note: cuối cùng sau 7749 cái lọc thì query mới hoàn thiện và được gán vào incomes
 
         /*
