@@ -149,3 +149,360 @@
 .circle-icon {
     @apply w-12 h-12 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-700 dark:text-gray-300;
 }
+
+/* Search box: compact icon that expands input on hover or focus */
+.search-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 4px 6px;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-muted) 8%, transparent);
+    transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.search-box:hover,
+.search-box.open {
+    background: color-mix(in srgb, var(--color-muted) 12%, transparent);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.search-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+    background: var(--color-card);
+    color: var(--color-muted-foreground);
+    cursor: pointer;
+    transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.search-box:hover .search-icon,
+.search-box.open .search-icon {
+    transform: scale(1.06);
+    color: var(--color-primary);
+}
+
+.search-input {
+    width: 0px;
+    opacity: 0;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    outline: none;
+    background: transparent;
+    color: var(--color-foreground);
+    transition: width 220ms cubic-bezier(.2,.9,.3,1),
+                opacity 160ms ease,
+                padding 200ms ease,
+                background 160ms ease,
+                box-shadow 160ms ease,
+                border-color 160ms ease;
+    font-family: var(--font-sans);
+    border-radius: 9999px; /* pill to match icon */
+}
+
+.search-box:hover .search-input,
+.search-box.open .search-input,
+.search-input:focus {
+    width: 220px; /* slightly wider when visible */
+    opacity: 1;
+    padding: 6px 12px;
+    background: color-mix(in srgb, var(--color-card) 94%, transparent);
+    border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.search-input::placeholder {
+    color: color-mix(in srgb, var(--color-muted-foreground) 60%, transparent);
+}
+
+.search-input:focus {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.09), 0 0 0 6px color-mix(in srgb, var(--color-primary) 10%, transparent);
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-card) 96%, transparent);
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .search-icon, .search-input, .search-box {
+        transition: none !important;
+    }
+}
+
+/* Icon click ripple + subtle rotation */
+.search-icon {
+    position: relative;
+    overflow: hidden;
+}
+
+.search-icon::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.7;
+    transition: transform 420ms cubic-bezier(.2,.9,.3,1), opacity 420ms ease;
+    pointer-events: none;
+}
+
+.search-icon.clicked::after {
+    transform: translate(-50%, -50%) scale(14);
+    opacity: 0;
+}
+
+.search-icon:active {
+    transform: scale(0.98) rotate(-6deg);
+}
+
+.search-box.open .search-icon {
+    transform: rotate(10deg) scale(1.04);
+}
+
+.search-icon:focus {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+/* FilterOrder controls styling */
+.filter-order {
+    display: inline-block;
+}
+
+.filter-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.filter-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: color-mix(in srgb, var(--color-muted) 6%, transparent);
+    padding: 6px 8px;
+    border-radius: 9999px;
+}
+
+.filter-label {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--color-muted-foreground);
+    font-size: 0.95rem;
+}
+
+.filter-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+
+.filter-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: var(--color-card);
+    border: 1px solid transparent;
+    padding: 6px 10px;
+    border-radius: 9999px;
+    color: var(--color-foreground);
+    transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+    font-family: var(--font-sans);
+}
+
+.filter-control:hover .filter-select,
+.filter-select:focus {
+    border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    transform: translateY(-1px);
+}
+
+.filter-select:focus {
+    outline: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06), 0 0 0 6px color-mix(in srgb, var(--color-primary) 8%, transparent);
+    border-color: var(--color-primary);
+}
+
+/* Make the native arrow smaller and subtle */
+.filter-select::-ms-expand { display: none; }
+
+/* Add button styling to match pill/icon controls */
+.add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 9999px;
+    background: var(--color-card);
+    color: var(--color-primary);
+    border: 1px solid color-mix(in srgb, var(--color-border) 30%, transparent);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    transition: transform 140ms ease, box-shadow 160ms ease, background 160ms ease, color 160ms ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+}
+
+.add-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-primary) 10%, var(--color-card));
+    color: var(--color-primary-foreground);
+}
+
+.add-btn:active .add-icon {
+    transform: scale(0.96) rotate(-8deg);
+}
+
+.add-btn:focus {
+    outline: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08), 0 0 0 6px color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.add-btn::after {
+    /* subtle ripple */
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.7;
+    transition: transform 420ms cubic-bezier(.2,.9,.3,1), opacity 420ms ease;
+    pointer-events: none;
+}
+
+.add-btn.clicked::after {
+    transform: translate(-50%, -50%) scale(16);
+    opacity: 0;
+}
+
+/* helper to trigger click animation from JS (same pattern used in SearchBox) */
+.add-btn.clicked .add-icon { transform: rotate(6deg) scale(1.02); }
+
+/* Icon-only variant: expand on hover/click by increasing padding and revealing text via max-width */
+.add-btn.icon-only {
+    padding: 5px; /* compact */
+    min-width: 36px; /* keep it compact initially */
+    height: 36px; /* slightly smaller */
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: padding 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+}
+
+/* keep text in DOM but hide it with max-width/opacity; animate max-width (auto can't be animated) */
+.add-btn.icon-only .add-text {
+    display: inline-block;
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-6px) scale(0.98);
+    margin-left: 6px;
+    overflow: hidden;
+    transition: max-width 220ms cubic-bezier(.2,.9,.3,1), opacity 180ms ease, transform 180ms ease;
+    white-space: nowrap;
+}
+
+/* on hover, focus-visible or clicked, expand padding to make room and reveal text */
+.add-btn.icon-only:hover,
+.add-btn.icon-only:focus-visible,
+.add-btn.icon-only.clicked {
+    padding: 5px 12px;
+}
+
+.add-btn.icon-only:hover .add-text,
+.add-btn.icon-only:focus-visible .add-text,
+.add-btn.icon-only.clicked .add-text {
+    max-width: 160px; /* reveal enough space for the label */
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+
+.add-btn.icon-only .add-icon {
+    width: 26px; /* slightly smaller icon */
+    height: 26px;
+}
+
+/* FSbox layout: top filter area, row with left (search + add) and right (filter-order) */
+.fsbox {
+    width: 100%;
+    display: block;
+    gap: 12px;
+}
+
+.fsbox-top {
+    margin-bottom: 12px;
+}
+
+.fsbox-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.fsbox-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fsbox-search {
+    /* keep search compact */
+}
+
+.fsbox-add {
+    display: inline-flex;
+}
+
+.fsbox-right {
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 850px) {
+    .fsbox-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    /* make left block full width and appear above right block */
+    .fsbox-left {
+        display: flex;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .fsbox-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .fsbox-add {
+        /* keep add button aligned to the left of search on small screens */
+    }
+}
