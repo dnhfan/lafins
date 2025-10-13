@@ -13,7 +13,7 @@ const iconByKey: Record<string, string> = {
 }
 
 // JarBox: hiển thị 1 hộp jar gồm icon, tên và số dư
-function JarBox({ name = 'Unknown Jar', balance = 0, icon, className = '' }: { name?: string; balance?: number; icon?: any; className?: string }) {
+function JarBox({ name = 'Unknown Jar', balance = 0, icon, className = '' }: { name?: string; balance?: number; icon?: React.ReactNode; className?: string }) {
     // Format số tiền theo chuẩn Việt Nam
     const formatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(balance) || 0)
 

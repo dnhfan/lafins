@@ -1,16 +1,25 @@
 import React from 'react';
 import { Inertia } from '@inertiajs/inertia';
 
+interface Income {
+  id: number | string;
+  date?: string;
+  source?: string;
+  description?: string;
+  amount?: number | string;
+  formatted_amount?: string;
+}
+
 interface Props {
-  item: any;
+  item: Income;
   idx: number;
-  onEdit: (item: any) => void;
+  onEdit: (item: Income) => void;
   onDelete: (id: number | string) => void;
   formatCurrency: (v: number | string) => string;
 }
 
 export default function IncomeTableRow({ item, idx, onEdit, onDelete, formatCurrency }: Props) {
-  const formatted = item.formatted_amount ?? formatCurrency(item.amount);
+  const formatted = item.formatted_amount ?? formatCurrency(item.amount ?? 0);
 
   return (
     <tr

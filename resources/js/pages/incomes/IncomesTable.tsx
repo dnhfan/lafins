@@ -5,7 +5,7 @@ import IncomeTableRow from './IncomeTableRow';
 import IncomeModal from '../../components/IncomeModal';
 
 // Kiểu paginator đơn giản
-type Paginator<T> = { data: T[]; meta?: Record<string, any> };
+type Paginator<T> = { data: T[]; meta?: Record<string, unknown> };
 
 // Type guard: kiểm tra xem value có phải paginator không
 function isPaginator<T>(v: unknown): v is Paginator<T> {
@@ -13,8 +13,17 @@ function isPaginator<T>(v: unknown): v is Paginator<T> {
 }
 
 // interfaces props 
+interface Income {
+  id: number | string;
+  date?: string;
+  source?: string;
+  description?: string;
+  amount?: number | string;
+  formatted_amount?: string;
+}
+
 interface IncomesPageProps {
-  incomes?: any[] | Paginator<any>;
+  incomes?: Income[] | Paginator<Income>;
   loading?: boolean;
   error?: string | null;
   // ... các props khác nếu có ...
@@ -23,7 +32,7 @@ interface IncomesPageProps {
 export default function IncomesTable() {
 
   // 1. Đọc props từ server do Inertia cung cấp
-  const { props } = usePage();
+  const { props } = usePage<IncomesPageProps & Record<string, unknown>>();
 
   // 2. DEBUG: Ghi log dữ liệu controller gửi tới console trình duyệt khi điều hướng tới trang Incomes
   useEffect(() => {
@@ -40,23 +49,23 @@ export default function IncomesTable() {
 
   // 3. Lấy data từ props
   // Dữ liệu từ backend thường gắn `incomes` vào props của trang; viết code phòng ngừa
-  const raw: unknown = (props as any).incomes;
+  const raw: unknown = props?.incomes as unknown;
 
   // Dùng type guard để chuẩn hóa
-  const incomes = isPaginator(raw)
+  const incomes = isPaginator<Income>(raw)
     ? raw.data
     : Array.isArray(raw)
-      ? raw
-      : [];
+      ? (raw as Income[])
+      : [] as Income[];
 
   // Lấy trạng thái loading/error từ props nếu có, nếu không thì dùng giá trị mặc định
-  const loading = (props as any).loading ?? false;
-  const error = (props as any).error ?? null;
+  const loading = props?.loading ?? false;
+  const error = props?.error ?? null;
 
-  const [editing, setEditing] = useState<any | null>(null);
+  const [editing, setEditing] = useState<Income | null>(null);
 
   // Danh sách đã lọc đơn giản hiện tại (sẽ kết nối tìm kiếm/lọc sau)
-  const filtered = Array.isArray(incomes) ? incomes : [];
+  const filtered: Income[] = Array.isArray(incomes) ? incomes : [];
 
   // format
   function formatCurrency(value: number | string) {
@@ -94,7 +103,7 @@ export default function IncomesTable() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((i: any, idx: number) => (
+                {filtered.map((i: Income, idx: number) => (
                   <IncomeTableRow
                     key={i.id}
                     item={i}
