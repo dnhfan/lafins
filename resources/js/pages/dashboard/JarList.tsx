@@ -19,14 +19,14 @@ function JarBox({ name = 'Unknown Jar', balance = 0, icon, className = '' }: { n
 
 
     return (
-        <div className={`${className} h-full p-7 border border-gray-200 rounded-lg bg-white shadow-sm flex items-center gap-3`}> 
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center">
+        <div className={`${className} h-full p-7 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-black shadow-sm dark:shadow-none flex items-center gap-3`}> 
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
                 {icon}
             </div>
 
             <div className="flex-1 text-left">
-                <div className="text-sm font-medium text-slate-700 whitespace-normal break-words">{name}</div>
-                <div className="text-sm text-slate-500 mt-1">{formatted}</div>
+                <div className="text-sm font-medium text-slate-700 dark:text-white whitespace-normal break-words">{name}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{formatted}</div>
             </div>
         </div>
     )
@@ -52,7 +52,7 @@ export default function JarList({ className }: {className:string}) {
             {Array.isArray(jars) && jars.map((j: Jar) => {
                 const iconClass = iconByKey[j.key as string] ?? 'fa-solid fa-circle-dot'
                 // Using <i> for FontAwesome class names present in project
-                const icon = <i className={`${iconClass} text-slate-700`} aria-hidden />
+                const icon = <i className={`${iconClass} text-slate-700 dark:text-white`} aria-hidden />
                 return (
                     <JarBox key={j.id} name={j.label ?? j.key} balance={j.balance} icon={icon} />
                 )

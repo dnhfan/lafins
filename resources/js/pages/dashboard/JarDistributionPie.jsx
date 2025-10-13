@@ -78,20 +78,25 @@ const buildChartData = (props) => {
             const mainFontPx = Math.max(8, Math.round(base * 0.11 * scale))
             const subFontPx = Math.max(6, Math.round(base * 0.07 * scale))
 
-            ctx.save()
-            ctx.fillStyle = '#0f172a'
-            ctx.font = `600 ${mainFontPx}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial`
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
+                    ctx.save()
+                    // choose colors based on dark mode presence on documentElement
+                    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+                    const mainColor = isDark ? '#ffffff' : '#0f172a'
+                    const subColor = isDark ? '#9ca3af' : '#6b7280'
 
-            const formatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(total)
-            // draw main amount a little above center so the label can sit below it; offsets are scaled too
-            ctx.fillText(formatted, centerX, centerY - Math.round(subFontPx / 1.5))
+                    ctx.fillStyle = mainColor
+                    ctx.font = `600 ${mainFontPx}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial`
+                    ctx.textAlign = 'center'
+                    ctx.textBaseline = 'middle'
 
-            ctx.fillStyle = '#6b7280'
-            ctx.font = `400 ${subFontPx}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial`
-            ctx.fillText('Tổng', centerX, centerY + Math.round(mainFontPx / 2.5))
-            ctx.restore()
+                    const formatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(total)
+                    // draw main amount a little above center so the label can sit below it; offsets are scaled too
+                    ctx.fillText(formatted, centerX, centerY - Math.round(subFontPx / 1.5))
+
+                    ctx.fillStyle = subColor
+                    ctx.font = `400 ${subFontPx}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial`
+                    ctx.fillText('Tổng', centerX, centerY + Math.round(mainFontPx / 2.5))
+                    ctx.restore()
         }
     }
 
@@ -102,7 +107,7 @@ const buildChartData = (props) => {
         cutout: '60%',
         plugins: {
             // default to right; component will toggle to bottom on small screens via JS if needed
-            legend: { position: 'right', labels: { boxWidth: 10, padding: 16 } },
+            legend: { position: 'right', labels: { boxWidth: 10, padding: 16, color: undefined } },
             tooltip: {
                 callbacks: {
                     label: function (context) {
@@ -117,6 +122,22 @@ const buildChartData = (props) => {
         },
         elements: { arc: { borderRadius: 8, hoverOffset: 8 } }
     }
+
+// Plugin to paint canvas background so the chart area appears black in dark mode
+const canvasBackgroundPlugin = {
+    id: 'canvasBackground',
+    beforeDraw: (chart) => {
+        if (typeof document === 'undefined') return
+        const isDark = document.documentElement.classList.contains('dark')
+        if (!isDark) return
+        const ctx = chart.canvas.getContext('2d')
+        ctx.save()
+        ctx.globalCompositeOperation = 'destination-over'
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(0, 0, chart.width, chart.height)
+        ctx.restore()
+    }
+}
 
 // Main Component
 export default function JarDistributionPie() {
@@ -145,18 +166,34 @@ export default function JarDistributionPie() {
 
     // allow legend to move to bottom when container is narrow (centralized helper)
     // we depend on measuredWidth so that when the wrapper grows back the options recompute
-    const responsiveOptions = useMemo(() => createResponsiveOptions(options, containerRef, 640), [size, measuredWidth])
+    // detect dark mode
+    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+
+    // create theme-aware options (clone base options and set text colors)
+    const themeOptions = useMemo(() => {
+        const copy = JSON.parse(JSON.stringify(options))
+        copy.plugins = copy.plugins || {}
+        copy.plugins.legend = copy.plugins.legend || {}
+        copy.plugins.legend.labels = copy.plugins.legend.labels || {}
+        copy.plugins.legend.labels.color = isDark ? '#ffffff' : '#0f172a'
+        copy.plugins.tooltip = copy.plugins.tooltip || {}
+        copy.plugins.tooltip.titleColor = isDark ? '#ffffff' : '#0f172a'
+        copy.plugins.tooltip.bodyColor = isDark ? '#ffffff' : '#0f172a'
+        return copy
+    }, [isDark])
+
+    const responsiveOptions = useMemo(() => createResponsiveOptions(themeOptions, containerRef, 640), [size, measuredWidth, themeOptions])
 
     return (
-        <div ref={containerRef} className="w-full p-4 bg-white rounded-lg shadow-sm">
+    <div ref={containerRef} className="w-full p-4 bg-white dark:bg-black rounded-lg shadow-sm dark:shadow-none">
             
             <div className="flex-1 text-center ">
-                <h3 className="text-m font-medium text-slate-700 mb-2">Jar Distribution</h3>
+                <h3 className="text-m font-medium text-slate-700 dark:text-white mb-2">Jar Distribution</h3>
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                 <div style={{ width: size, height: size }} className="flex items-center justify-center">
-                    <Doughnut data={chartData} options={responsiveOptions} plugins={[centerTextPlugin]} />
+                    <Doughnut data={chartData} options={responsiveOptions} plugins={[centerTextPlugin, canvasBackgroundPlugin]} />
                 </div>
             </div>
         </div>

@@ -57,7 +57,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* chart: split into two columns (left: pie, right: income/outcome) */}
-                <div id='chart' className="relative overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-[40vh] dark:border-sidebar-border">
+                <div id='chart' className="relative overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-[40vh] dark:border-sidebar-border dark:bg-black">
                     <div className="p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full items-center">
                             <div className="flex items-center justify-center">

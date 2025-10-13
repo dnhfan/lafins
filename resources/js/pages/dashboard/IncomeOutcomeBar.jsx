@@ -45,8 +45,8 @@ const baseOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-        legend: { position: 'top' },
-        title: { display: true, text: 'Compare Income - OutCome with bar Chart' },
+    legend: { position: 'top' },
+    title: { display: true, text: 'Compare Income - OutCome with bar Chart' },
         tooltip: {
             callbacks: {
                 label: (context) => {
@@ -63,6 +63,22 @@ const baseOptions = {
                 callback: (value) => Number(value).toLocaleString('vi-VN')
             }
         }
+    }
+}
+
+// plugin to paint canvas background black when dark mode is active
+const canvasBackgroundPlugin = {
+    id: 'canvasBackground',
+    beforeDraw: (chart) => {
+        if (typeof document === 'undefined') return
+        const isDark = document.documentElement.classList.contains('dark')
+        if (!isDark) return
+        const ctx = chart.canvas.getContext('2d')
+        ctx.save()
+        ctx.globalCompositeOperation = 'destination-over'
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(0, 0, chart.width, chart.height)
+        ctx.restore()
     }
 }
 
@@ -85,18 +101,39 @@ export default function IcomeOutcomeBar() {
     const containerRef = useRef(null)
     // use shared hook to compute size (debounced, SSR safe)
     const { size, measuredWidth } = useResponsiveChartSize(containerRef, { min: 220, max: 720, scale: 0.9 })
-    const responsiveOptions = useMemo(() => createResponsiveOptions(baseOptions, containerRef, 640), [size, measuredWidth])
+    // theme-aware options: adjust legend, title and tooltip colors for dark mode
+    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+    const themeBaseOptions = useMemo(() => {
+        const copy = JSON.parse(JSON.stringify(baseOptions))
+        copy.plugins = copy.plugins || {}
+        copy.plugins.legend = copy.plugins.legend || {}
+        copy.plugins.legend.labels = copy.plugins.legend.labels || {}
+        copy.plugins.legend.labels.color = isDark ? '#ffffff' : '#0f172a'
+        copy.plugins.title = copy.plugins.title || {}
+        copy.plugins.title.color = isDark ? '#ffffff' : '#0f172a'
+        copy.plugins.tooltip = copy.plugins.tooltip || {}
+        copy.plugins.tooltip.titleColor = isDark ? '#ffffff' : '#0f172a'
+        copy.plugins.tooltip.bodyColor = isDark ? '#ffffff' : '#0f172a'
+        // y-axis tick color
+        copy.scales = copy.scales || {}
+        copy.scales.y = copy.scales.y || {}
+        copy.scales.y.ticks = copy.scales.y.ticks || {}
+        copy.scales.y.ticks.color = isDark ? '#ffffff' : '#0f172a'
+        return copy
+    }, [isDark])
+
+    const responsiveOptions = useMemo(() => createResponsiveOptions(themeBaseOptions, containerRef, 640), [size, measuredWidth, themeBaseOptions])
 
     return (
-        <div ref={containerRef} className="w-full p-4 bg-white rounded-lg shadow-sm">
+    <div ref={containerRef} className="w-full p-4 bg-white dark:bg-black rounded-lg shadow-sm dark:shadow-none">
 
             <div className="flex-1 text-center ">
-                <h3 className="text-m font-medium text-slate-700 mb-2">Income / Outcome</h3>
+                <h3 className="text-m font-medium text-slate-700 dark:text-white mb-2">Income / Outcome</h3>
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                 <div style={{ width: size, height: Math.round(size * 0.6) }} className="flex items-center justify-center">
-                    <Bar data={chartData} options={responsiveOptions} />
+                    <Bar data={chartData} options={responsiveOptions} plugins={[canvasBackgroundPlugin]} />
                 </div>
             </div>
         </div>
