@@ -85,7 +85,7 @@ export default function IncomesTable() {
               <thead className="bg-gray-50 dark:bg-slate-700">
                 <tr className="text-left text-xs uppercase text-slate-500">
                   <th className="p-3 sticky top-0">Date</th>
-                  <th className="p-3 sticky top-0">Source</th>
+                  <th className="p-3 sticky top-0">Category</th>
                   <th className="p-3 sticky top-0">Description</th>
                   <th className="p-3 sticky top-0 text-right">Amount</th>
                   <th className="p-3 sticky top-0 text-center">Actions</th>
@@ -110,9 +110,7 @@ export default function IncomesTable() {
                           className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-blue-50 text-blue-700 hover:bg-blue-100"
                         >
                           {/* pencil icon */}
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                            <path d="M17.414 2.586a2 2 0 010 2.828l-9.193 9.193a1 1 0 01-.464.263l-4 1a1 1 0 01-1.213-1.213l1-4a1 1 0 01.263-.464L14.586 2.586a2 2 0 012.828 0z" />
-                          </svg>
+                          <i className="fa-solid fa-pencil"></i>
                           <span className="hidden sm:inline">Edit</span>
                         </button>
                         <button
@@ -121,9 +119,7 @@ export default function IncomesTable() {
                           className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-red-50 text-red-700 hover:bg-red-100"
                         >
                           {/* trash icon */}
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v6a1 1 0 001 1h6a1 1 0 001-1V8a1 1 0 10-2 0v6H8V8z" clipRule="evenodd" />
-                          </svg>
+                          <i className="fa-solid fa-trash"></i>
                           <span className="hidden sm:inline">Delete</span>
                         </button>
                       </td>
