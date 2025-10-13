@@ -1,4 +1,6 @@
 
+import ActionButton from '@/components/ActionButton';
+
 interface Income {
   id: number | string;
   date?: string;
@@ -29,22 +31,16 @@ export default function IncomeTableRow({ item, idx, onEdit, onDelete, formatCurr
       <td className="p-3 align-top truncate max-w-[28rem]">{item.description}</td>
       <td className="p-3 align-top text-right font-mono">{formatted}</td>
       <td className="p-3 align-top flex gap-2 justify-center">
-        <button
-          onClick={() => onEdit(item)}
-          title="Edit"
-          className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-blue-50 text-blue-700 hover:bg-blue-100"
-        >
-          <i className="fa-solid fa-pencil"></i>
-          <span className="hidden sm:inline">Edit</span>
-        </button>
-        <button
-          onClick={() => onDelete(item.id)}
-          title="Delete"
-          className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-red-50 text-red-700 hover:bg-red-100"
-        >
-          <i className="fa-solid fa-trash"></i>
-          <span className="hidden sm:inline">Delete</span>
-        </button>
+        <>
+          <ActionButton variant="primary" title="Edit" onClick={() => onEdit(item)}>
+            <i className="fa-solid fa-pencil" />
+            <span className="hidden sm:inline">Edit</span>
+          </ActionButton>
+          <ActionButton variant="danger" title="Delete" onClick={() => onDelete(item.id)}>
+            <i className="fa-solid fa-trash" />
+            <span className="hidden sm:inline">Delete</span>
+          </ActionButton>
+        </>
       </td>
     </tr>
   );
