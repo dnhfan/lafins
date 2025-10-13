@@ -27,16 +27,16 @@ const mainNavItems: NavItem[] = [
         href: '/incomes',
         icon: ArrowUpCircle,
     },
-    // {
-    //     title: 'Outcomes', 
-    //     href: '/outcomes',
-    //     icon: ArrowDownCircle
-    // },
-    // {
-    //     title: 'Jar Configs',
-    //     href: '/jarconfigs',
-    //     icon: Sliders,
-    // }
+    {
+        title: 'Outcomes', 
+        href: '/outcomes',
+        icon: ArrowDownCircle
+    },
+    {
+        title: 'Jar Configs',
+        href: '/jarconfigs',
+        icon: Sliders,
+    }
 ];
 
 const footerNavItems: NavItem[] = [
