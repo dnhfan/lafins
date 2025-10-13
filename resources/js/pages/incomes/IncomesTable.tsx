@@ -9,7 +9,7 @@ type Paginator<T> = { data: T[]; meta?: Record<string, unknown> };
 
 // Type guard: kiểm tra xem value có phải paginator không
 function isPaginator<T>(v: unknown): v is Paginator<T> {
-  return typeof v === 'object' && v !== null && Array.isArray((v as any).data);
+  return typeof v === 'object' && v !== null && 'data' in (v as object) && Array.isArray((v as Paginator<unknown>).data);
 }
 
 // interfaces props 
