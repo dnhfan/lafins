@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
+import IncomeTableRow from './IncomeTableRow';
+import IncomeModal from '../../components/IncomeModal';
 
 // Kiểu paginator đơn giản
 type Paginator<T> = { data: T[]; meta?: Record<string, any> };
@@ -10,7 +12,7 @@ function isPaginator<T>(v: unknown): v is Paginator<T> {
   return typeof v === 'object' && v !== null && Array.isArray((v as any).data);
 }
 
-// Giao diện props rõ ràng
+// interfaces props 
 interface IncomesPageProps {
   incomes?: any[] | Paginator<any>;
   loading?: boolean;
@@ -92,40 +94,16 @@ export default function IncomesTable() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((i: any, idx: number) => {
-                  const formatted = i.formatted_amount ?? formatCurrency(i.amount);
-                  return (
-                    <tr
-                      key={i.id}
-                      className={`border-t ${idx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50 dark:bg-slate-700'} hover:bg-gray-100 dark:hover:bg-slate-600`}
-                    >
-                      <td className="p-3 align-top">{i.date}</td>
-                      <td className="p-3 align-top">{i.source}</td>
-                      <td className="p-3 align-top truncate max-w-[28rem]">{i.description}</td>
-                      <td className="p-3 align-top text-right font-mono">{formatted}</td>
-                      <td className="p-3 align-top flex gap-2 justify-center">
-                        <button
-                          onClick={() => setEditing(i)}
-                          title="Edit"
-                          className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-blue-50 text-blue-700 hover:bg-blue-100"
-                        >
-                          {/* pencil icon */}
-                          <i className="fa-solid fa-pencil"></i>
-                          <span className="hidden sm:inline">Edit</span>
-                        </button>
-                        <button
-                          onClick={() => handleDelete(i.id)}
-                          title="Delete"
-                          className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-red-50 text-red-700 hover:bg-red-100"
-                        >
-                          {/* trash icon */}
-                          <i className="fa-solid fa-trash"></i>
-                          <span className="hidden sm:inline">Delete</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {filtered.map((i: any, idx: number) => (
+                  <IncomeTableRow
+                    key={i.id}
+                    item={i}
+                    idx={idx}
+                    onEdit={(item) => setEditing(item)}
+                    onDelete={(id) => handleDelete(id)}
+                    formatCurrency={formatCurrency}
+                  />
+                ))}
               </tbody>
             </table>
             {Array.isArray(filtered) && filtered.length === 0 && (
@@ -134,6 +112,14 @@ export default function IncomesTable() {
           </div>
         </div>
       )}
+      {/* Update modal: open when editing is set */}
+      <IncomeModal
+        type="update"
+        isOpen={Boolean(editing)}
+        onClose={() => setEditing(null)}
+        initialData={editing}
+        onSuccess={() => { setEditing(null); Inertia.reload(); }}
+      />
     </>
   );
 }
