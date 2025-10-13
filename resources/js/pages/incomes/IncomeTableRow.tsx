@@ -1,5 +1,3 @@
-import React from 'react';
-import { Inertia } from '@inertiajs/inertia';
 
 interface Income {
   id: number | string;
