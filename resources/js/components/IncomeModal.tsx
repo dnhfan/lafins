@@ -42,7 +42,7 @@ export default function IncomeModal({ type, isOpen, onClose, initialData = null,
     else if (type === 'add') {
       reset();
     }
-  }, [initialData, type, isOpen]);
+  }, [initialData, type, isOpen, setData, reset]);
   
   // hande state when data in UI is changed
   function change(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
