@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import { usePage } from '@inertiajs/react';
 import { Bar } from 'react-chartjs-2';
 import useResponsiveChartSize from '@/hooks/useResponsiveChartSize'

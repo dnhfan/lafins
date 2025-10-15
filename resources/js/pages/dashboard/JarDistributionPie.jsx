@@ -1,5 +1,5 @@
 import { usePage } from "@inertiajs/react"
-import { useRef, useState, useEffect, useMemo } from 'react'
+import { useRef, useMemo } from 'react'
 import useResponsiveChartSize from '@/hooks/useResponsiveChartSize'
 import { createResponsiveOptions } from '@/lib/chartOptions'
 import { DEFAULT_PALETTE } from '@/lib/chartColors'
