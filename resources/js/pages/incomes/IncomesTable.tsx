@@ -3,6 +3,7 @@ import { usePage } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
 import IncomeTableRow from './IncomeTableRow';
 import IncomeModal from '../../components/IncomeModal';
+import Pagination from '../../components/Pagination';
 
 // Kiểu paginator đơn giản
 type Paginator<T> = { data: T[]; meta?: Record<string, unknown> };
@@ -52,7 +53,8 @@ export default function IncomesTable() {
   const raw: unknown = props?.incomes as unknown;
 
   // Dùng type guard để chuẩn hóa
-  const incomes = isPaginator<Income>(raw)
+  const isPag = isPaginator<Income>(raw);
+  const incomes = isPag
     ? raw.data
     : Array.isArray(raw)
       ? (raw as Income[])
@@ -118,6 +120,10 @@ export default function IncomesTable() {
             {Array.isArray(filtered) && filtered.length === 0 && (
               <div className="p-6 text-center text-sm text-slate-500">Không có mục thu nhập nào.</div>
             )}
+              {/* Pagination controls (server-driven) */}
+              {isPag && (
+                <Pagination paginator={raw as any} />
+              )}
           </div>
         </div>
       )}
