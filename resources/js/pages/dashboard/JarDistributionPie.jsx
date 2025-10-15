@@ -127,13 +127,14 @@ const buildChartData = (props) => {
 const canvasBackgroundPlugin = {
     id: 'canvasBackground',
     beforeDraw: (chart) => {
-        if (typeof document === 'undefined') return
-        const isDark = document.documentElement.classList.contains('dark')
-        if (!isDark) return
+        if (typeof chart?.canvas === 'undefined') return
         const ctx = chart.canvas.getContext('2d')
+        if (!ctx) return
         ctx.save()
+        // draw behind existing content
         ctx.globalCompositeOperation = 'destination-over'
-        ctx.fillStyle = '#000000'
+        // use requested color for canvas background
+        ctx.fillStyle = 'oklch(0.145 0 0)'
         ctx.fillRect(0, 0, chart.width, chart.height)
         ctx.restore()
     }
@@ -177,15 +178,15 @@ export default function JarDistributionPie() {
         copy.plugins.legend.labels = copy.plugins.legend.labels || {}
         copy.plugins.legend.labels.color = isDark ? '#ffffff' : '#0f172a'
         copy.plugins.tooltip = copy.plugins.tooltip || {}
-        copy.plugins.tooltip.titleColor = isDark ? '#ffffff' : '#0f172a'
-        copy.plugins.tooltip.bodyColor = isDark ? '#ffffff' : '#0f172a'
+        copy.plugins.tooltip.titleColor = '#ffffff'
+        copy.plugins.tooltip.bodyColor =  '#ffffff' 
         return copy
     }, [isDark])
 
     const responsiveOptions = useMemo(() => createResponsiveOptions(themeOptions, containerRef, 640), [size, measuredWidth, themeOptions])
 
     return (
-    <div ref={containerRef} className="w-full p-4 bg-white dark:bg-black rounded-lg shadow-sm dark:shadow-none">
+    <div ref={containerRef} className="w-full p-4 rounded-lg shadow-sm dark:shadow-none" style={{ backgroundColor: 'oklch(0.145 0 0)' }}>
             
             <div className="flex-1 text-center ">
                 <h3 className="text-m font-medium text-slate-700 dark:text-white mb-2">Jar Distribution</h3>

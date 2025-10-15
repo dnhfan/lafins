@@ -112,8 +112,8 @@ export default function IcomeOutcomeBar() {
         copy.plugins.title = copy.plugins.title || {}
         copy.plugins.title.color = isDark ? '#ffffff' : '#0f172a'
         copy.plugins.tooltip = copy.plugins.tooltip || {}
-        copy.plugins.tooltip.titleColor = isDark ? '#ffffff' : '#0f172a'
-        copy.plugins.tooltip.bodyColor = isDark ? '#ffffff' : '#0f172a'
+        copy.plugins.tooltip.titleColor =  '#ffffff' 
+        copy.plugins.tooltip.bodyColor =  '#ffffff' 
         // y-axis tick color
         copy.scales = copy.scales || {}
         copy.scales.y = copy.scales.y || {}
@@ -125,7 +125,7 @@ export default function IcomeOutcomeBar() {
     const responsiveOptions = useMemo(() => createResponsiveOptions(themeBaseOptions, containerRef, 640), [size, measuredWidth, themeBaseOptions])
 
     return (
-    <div ref={containerRef} className="w-full p-4 bg-white dark:bg-black rounded-lg shadow-sm dark:shadow-none">
+    <div ref={containerRef} className="w-full p-4 rounded-lg shadow-sm dark:shadow-none" style={{ backgroundColor: 'oklch(0.145 0 0)' }}>
 
             <div className="flex-1 text-center ">
                 <h3 className="text-m font-medium text-slate-700 dark:text-white mb-2">Income / Outcome</h3>
