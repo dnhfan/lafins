@@ -9,7 +9,7 @@ function Fillter({ name, selected, onClick }: { name: string; selected?: boolean
             type="button"
             onClick={onClick}
             aria-pressed={selected}
-            className={`flex-1 text-sm py-2 px-3 border rounded-md transition-colors ${selected ? 'bg-primary text-primary-foreground shadow-xs border-transparent' : 'border-sidebar-border/50 bg-transparent hover:bg-muted'}`}
+            className={`flex-1 text-sm py-2 px-3 border rounded-md transition-colors ${selected ? 'bg-primary text-primary-foreground shadow-xs border-transparent' : 'border-gray-700 bg-transparent hover:bg-muted'}`}
         >
             {name}
         </button>

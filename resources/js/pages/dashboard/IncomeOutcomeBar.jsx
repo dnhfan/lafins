@@ -76,7 +76,9 @@ const canvasBackgroundPlugin = {
         const ctx = chart.canvas.getContext('2d')
         ctx.save()
         ctx.globalCompositeOperation = 'destination-over'
-        ctx.fillStyle = '#000000'
+        // prefer an OKLCH value only in dark mode; fallback to black if OKLCH unsupported
+        // Use #0a0a0a as the dark background for canvas
+        ctx.fillStyle = '#0a0a0a'
         ctx.fillRect(0, 0, chart.width, chart.height)
         ctx.restore()
     }
@@ -125,7 +127,7 @@ export default function IcomeOutcomeBar() {
     const responsiveOptions = useMemo(() => createResponsiveOptions(themeBaseOptions, containerRef, 640), [size, measuredWidth, themeBaseOptions])
 
     return (
-    <div ref={containerRef} className="w-full p-4 rounded-lg shadow-sm dark:shadow-none" style={{ backgroundColor: 'oklch(0.145 0 0)' }}>
+    <div ref={containerRef} className="w-full p-4 rounded-lg shadow-sm dark:shadow-none bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-gray-700">
 
             <div className="flex-1 text-center ">
                 <h3 className="text-m font-medium text-slate-700 dark:text-white mb-2">Income / Outcome</h3>

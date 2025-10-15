@@ -143,7 +143,7 @@
 }
 
 .card-default {
-  @apply relative w-full box-border h-auto overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border;
+  @apply relative w-full box-border h-auto overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-gray-700;
 }
 
 .circle-icon {

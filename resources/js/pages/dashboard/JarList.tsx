@@ -19,7 +19,7 @@ function JarBox({ name = 'Unknown Jar', balance = 0, icon, className = '' }: { n
 
 
     return (
-        <div className={`${className} h-full p-7 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm dark:shadow-none flex items-center gap-3`} style={{ backgroundColor: 'oklch(0.145 0 0)' }}> 
+    <div className={`${className} h-full p-7 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm dark:shadow-none flex items-center gap-3 bg-white dark:bg-[#0a0a0a]`}> 
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
                 {icon}
             </div>

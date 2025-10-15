@@ -133,9 +133,12 @@ const canvasBackgroundPlugin = {
         ctx.save()
         // draw behind existing content
         ctx.globalCompositeOperation = 'destination-over'
-        // use requested color for canvas background
-        ctx.fillStyle = 'oklch(0.145 0 0)'
-        ctx.fillRect(0, 0, chart.width, chart.height)
+        // only use oklch when dark mode is active in documentElement
+        const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+        if (isDark) {
+            ctx.fillStyle = '#0a0a0a'
+            ctx.fillRect(0, 0, chart.width, chart.height)
+        }
         ctx.restore()
     }
 }
@@ -186,7 +189,7 @@ export default function JarDistributionPie() {
     const responsiveOptions = useMemo(() => createResponsiveOptions(themeOptions, containerRef, 640), [size, measuredWidth, themeOptions])
 
     return (
-    <div ref={containerRef} className="w-full p-4 rounded-lg shadow-sm dark:shadow-none" style={{ backgroundColor: 'oklch(0.145 0 0)' }}>
+    <div ref={containerRef} className="w-full p-4 rounded-lg shadow-sm dark:shadow-none bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-gray-700">
             
             <div className="flex-1 text-center ">
                 <h3 className="text-m font-medium text-slate-700 dark:text-white mb-2">Jar Distribution</h3>
