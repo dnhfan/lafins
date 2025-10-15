@@ -68,5 +68,54 @@ class OutcomeSeeder extends Seeder
                 $jar->save();
             }
         }
+
+        // Generate many outcomes for pagination testing
+        $categories = ['food', 'transport', 'entertainment', 'education', 'health', 'shopping', 'bills', 'other'];
+        $now = Carbon::now();
+
+        // We'll attempt to create 300 outcomes. If jars run out of balance, outcomes may be created without a jar.
+        for ($i = 0; $i < 300; $i++) {
+            $category = $categories[$i % count($categories)];
+            $amount = random_int(50000, 2000000); // between 50k and 2M
+
+            // Choose a jar randomly from available jars or null
+            $jarNames = $jarMap->keys()->all();
+            $jar = null;
+            if (!empty($jarNames) && random_int(0, 100) < 80) { // 80% of outcomes tied to a jar
+                $chosen = $jarNames[array_rand($jarNames)];
+                $jar = $jarMap->get($chosen);
+                $jar->refresh();
+
+                if ($jar->balance <= 0) {
+                    $jar = null;
+                } else {
+                    if ($amount > $jar->balance) {
+                        $amount = $jar->balance;
+                    }
+                }
+            }
+
+            // Spread dates across the last 12 months
+            $daysAgo = (int) floor(($i / 300) * 365);
+            $date = $now->copy()->subDays($daysAgo)->subDays(random_int(0, 30))->toDateString();
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $outcome = Outcome::create([
+                'user_id' => $user->id,
+                'jar_id' => $jar ? $jar->id : null,
+                'amount' => $amount,
+                'category' => $category,
+                'description' => 'Seeded outcome for pagination test',
+                'date' => $date,
+            ]);
+
+            if ($jar && $amount > 0) {
+                $jar->balance = max(0, $jar->balance - $amount);
+                $jar->save();
+            }
+        }
     }
 }
