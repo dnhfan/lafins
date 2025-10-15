@@ -2,10 +2,12 @@
 import React, { useRef, useState } from "react";
 
 export default function SearchBox() {
+    // state for open animation
     const [open, setOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const btnRef = useRef<HTMLButtonElement | null>(null);
-
+    
+    // funtion for animate
     function animateClick() {
         const btn = btnRef.current;
         if (!btn) return;
@@ -13,6 +15,7 @@ export default function SearchBox() {
         window.setTimeout(() => btn.classList.remove("clicked"), 420);
     }
 
+    // trigger function when click
     function handleIconClick() {
         animateClick();
         setOpen(true);

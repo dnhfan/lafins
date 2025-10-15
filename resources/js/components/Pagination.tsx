@@ -73,7 +73,9 @@ export default function Pagination({ paginator, buildUrl }: Props) {
 
         {from > 1 && (
           <>
-            <button onClick={() => goTo(1)} className="px-2 py-1 rounded text-sm">1</button>
+            <PaginationButton onClick={() => goTo(1)} active={current === 1}>
+              1
+            </PaginationButton>
             {from > 2 && <span className="px-2">…</span>}
           </>
         )}
