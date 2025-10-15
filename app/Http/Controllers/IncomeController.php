@@ -24,6 +24,14 @@ class IncomeController extends Controller
         // 2. base query
         $query = Income::where('user_id', $user->id);
 
+        // If user navigates to /incomes without any range/start/end/page params,
+        // redirect them to the default view: range=day and page=1.
+        // This provides a consistent initial state and avoids showing an empty
+        // unfiltered list.
+        if (! $request->filled('range') && ! $request->filled('start') && ! $request->filled('end') && ! $request->filled('page')) {
+            return redirect()->route('incomes', ['range' => 'day', 'page' => 1]);
+        }
+
         // 3. Range preset (day/month/year)
         if ($request->filled('range')) {
             // if range isset
