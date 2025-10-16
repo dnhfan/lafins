@@ -63,7 +63,14 @@ class IncomeController extends Controller
             $query->whereBetween('date', [$start, $end]);
         }
 
-        // 5. search -> we gonna make it in client hehe
+        // 5. search (server-side): support searching by `source` or `description`
+        if ($request->filled('search')) {
+            $term = $request->input('search');
+            $query->where(function ($q) use ($term) {
+                $q->where('source', 'like', "%{$term}%")
+                  ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
 
         // 6. sorting (only allow safe collums) -> client again hj
 
