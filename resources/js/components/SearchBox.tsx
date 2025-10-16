@@ -6,11 +6,17 @@ import { usePage } from '@inertiajs/react';
 export default function SearchBox() {
     // state for open animation
     const [open, setOpen] = useState(false);
+
+   
     const inputRef = useRef<HTMLInputElement | null>(null);
     const btnRef = useRef<HTMLButtonElement | null>(null);
 
     // state for search
-    const { props } = usePage();
+    // mirror open state in a ref so rapid clicks can read current value synchronously
+    const openRef = useRef<boolean>(false);
+    const { props } = usePage() as any;
+    // loading indicator while Inertia request is in progress
+    const [loading, setLoading] = useState(false);
     
     // funtion for animate
     function animateClick() {
@@ -24,6 +30,7 @@ export default function SearchBox() {
     function handleIconClick() {
         animateClick();
         setOpen(true);
+        openRef.current = true;
         // focus the input shortly after opening so keyboard users can type
         setTimeout(() => inputRef.current?.focus(), 50);
     }
@@ -31,6 +38,7 @@ export default function SearchBox() {
     function handleBlur() {
         // collapse when input loses focus
         setOpen(false);
+        openRef.current = false;
     }
 
     // handle when press key
@@ -49,7 +57,13 @@ export default function SearchBox() {
             // preserve other filters if present (read from top-level props)
             const filters = (props && props.filters) ? props.filters : {};
             const data = { ...filters, search: val, page };
-            Inertia.get(window.location.pathname, data, { preserveState: false, preserveScroll: true });
+            Inertia.get(window.location.pathname, data, {
+                preserveState: false,
+                preserveScroll: true,
+                // show spinner while request is in flight
+                onStart: () => setLoading(true),
+                onFinish: () => setLoading(false),
+            });
         }
     }
 
@@ -58,8 +72,40 @@ export default function SearchBox() {
         const page = 1;
         const filters = (props && props.filters) ? props.filters : {};
         const data = { ...filters, search: val, page };
-        Inertia.get(window.location.pathname, data, { preserveState: false, preserveScroll: true });
+        Inertia.get(window.location.pathname, data, {
+            preserveState: false,
+            preserveScroll: true,
+            onStart: () => setLoading(true),
+            onFinish: () => setLoading(false),
+        });
     }
+
+    // clear search from URL (and input) and reload preserving other filters
+    function clearSearch() {
+        const filters = (props && props.filters) ? { ...props.filters } : {} as Record<string, any>;
+        if (filters.search) delete filters.search;
+        const data = { ...filters, page: 1 };
+
+        // clear input visually
+        if (inputRef.current) inputRef.current.value = '';
+        // close input
+        setOpen(false);
+        openRef.current = false;
+
+        Inertia.get(window.location.pathname, data, {
+            preserveState: false,
+            preserveScroll: true,
+            onStart: () => setLoading(true),
+            onFinish: () => setLoading(false),
+        });
+    }
+
+    // compute whether there's an active search: server props, input value, or URL query
+    const hasSearch = Boolean(
+        (props && props.filters && props.filters.search) ||
+        (inputRef.current && inputRef.current.value) ||
+        (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('search'))
+    );
 
     return (
         <div className={`search-box ${open ? "open" : ""}`}>
@@ -69,10 +115,31 @@ export default function SearchBox() {
                 className="search-icon"
                 aria-label="Open search"
                 aria-expanded={open}
-                onClick={() => { animateClick(); if (!open) { handleIconClick() } else { submitSearch() } }}
-                onMouseDown={animateClick}
+                onClick={() => {
+                    animateClick();
+                    // use openRef to decide immediately whether to open or submit (avoids waiting for state update)
+                    if (!openRef.current) {
+                        handleIconClick();
+                    } else {
+                        submitSearch();
+                    }
+                }}
+                onMouseDown={(e) => {
+                    // Prevent the input from blurring before the click event fires.
+                    // Without this, clicking the icon while input is focused causes onBlur to run
+                    // and set openRef.current = false before onClick runs.
+                    e.preventDefault();
+                    animateClick();
+                }}
             >
-                <i className="fa-solid fa-search" aria-hidden />
+                {loading ? (
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden>
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" opacity="0.25"></circle>
+                        <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round"></path>
+                    </svg>
+                ) : (
+                    <i className="fa-solid fa-search" aria-hidden />
+                )}
             </button>
 
             <input
@@ -83,8 +150,19 @@ export default function SearchBox() {
                 id="search"
                 placeholder="Search"
                 onBlur={handleBlur}
+                onFocus={() => { setOpen(true); openRef.current = true; }}
                 onKeyDown={handleKeyDown}
             />
+            {open && hasSearch ? (
+                <button
+                    type="button"
+                    className="search-clear ml-2 text-sm text-muted-foreground"
+                    aria-label="Clear search"
+                    onClick={clearSearch}
+                >
+                    <i className="fa-solid fa-circle-xmark"></i>
+                </button>
+            ) : null}
         </div>
     );
 }
