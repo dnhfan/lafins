@@ -13,6 +13,16 @@ function isPaginator<T>(v: unknown): v is Paginator<T> {
   return typeof v === 'object' && v !== null && 'data' in (v as object) && Array.isArray((v as Paginator<unknown>).data);
 }
 
+// Local paginator shape for passing to Pagination component
+type PaginatorShape = {
+  current_page?: number;
+  last_page?: number;
+  last?: number;
+  total?: number;
+  path?: string;
+  meta?: { current_page?: number; last_page?: number };
+};
+
 // interfaces props 
 interface Income {
   id: number | string;
@@ -122,7 +132,7 @@ export default function IncomesTable() {
             )}
               {/* Pagination controls (server-driven) */}
               {isPag && (
-                <Pagination paginator={raw as any} />
+                <Pagination paginator={raw as PaginatorShape} />
               )}
           </div>
         </div>

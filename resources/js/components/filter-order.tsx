@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-export type SortBy = 'amount' | 'time'
+export type SortBy = 'amount' | 'date'
 export type SortDir = 'asc' | 'desc'
 
 export interface FilterOrderValue {
@@ -24,11 +24,13 @@ export interface FilterOrderProps {
  *   2) sort direction: low -> high (asc) / high -> low (desc)
  */
 export default function FilterOrder({ value, onChange, className }: FilterOrderProps) {
-	const [by, setBy] = useState<SortBy>(value?.by ?? 'amount')
-	const [dir, setDir] = useState<SortDir>(value?.dir ?? 'asc')
+	const [by, setBy] = useState<SortBy>(value?.by ?? 'date')
+	const [dir, setDir] = useState<SortDir>(value?.dir ?? 'desc')
+	// track first render to avoid emitting onChange on mount
+	const mountedRef = useRef<boolean>(false)
 
 	useEffect(() => {
-		// keep external value in sync when prop changes
+		// keep external value in sync when prop changes / take props from server
 		if (value) {
 			if (value.by !== by) setBy(value.by)
 			if (value.dir !== dir) setDir(value.dir)
@@ -37,6 +39,11 @@ export default function FilterOrder({ value, onChange, className }: FilterOrderP
 	}, [value])
 
 	useEffect(() => {
+		// avoid calling onChange on initial mount — only notify when user actually changes selection
+		if (!mountedRef.current) {
+			mountedRef.current = true;
+			return;
+		}
 		onChange?.({ by, dir })
 	}, [by, dir, onChange])
 
@@ -52,8 +59,8 @@ export default function FilterOrder({ value, onChange, className }: FilterOrderP
 							onChange={(e) => setBy(e.target.value as SortBy)}
 							aria-label="Sort by"
 						>
+							<option value="date">Date</option>
 							<option value="amount">Amount</option>
-							<option value="time">Time</option>
 						</select>
 					</label>
 

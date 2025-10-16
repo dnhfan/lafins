@@ -14,7 +14,7 @@ export default function SearchBox() {
     // state for search
     // mirror open state in a ref so rapid clicks can read current value synchronously
     const openRef = useRef<boolean>(false);
-    const { props } = usePage() as any;
+    const { props } = usePage<{ filters?: Record<string, string | number | undefined> }>();
     // loading indicator while Inertia request is in progress
     const [loading, setLoading] = useState(false);
     
@@ -62,7 +62,7 @@ export default function SearchBox() {
             const page = 1; // reset to first page on new search
 
             // preserve other filters if present (read from top-level props)
-            const filters = (props && props.filters) ? props.filters : {};
+            const filters = props?.filters ?? {};
             const data = { ...filters, search: val, page };
             Inertia.get(window.location.pathname, data, {
                 preserveState: false,
@@ -77,7 +77,7 @@ export default function SearchBox() {
     function submitSearch() {
         const val = inputRef.current?.value ?? '';
         const page = 1;
-        const filters = (props && props.filters) ? props.filters : {};
+    const filters = props?.filters ?? {};
         const data = { ...filters, search: val, page };
         Inertia.get(window.location.pathname, data, {
             preserveState: false,
@@ -89,7 +89,7 @@ export default function SearchBox() {
 
     // clear search from URL (and input) and reload preserving other filters
     function clearSearch() {
-        const filters = (props && props.filters) ? { ...props.filters } : {} as Record<string, any>;
+    const filters = props?.filters ? { ...props.filters } : {} as Record<string, string | number | undefined>;
         if (filters.search) delete filters.search;
         const data = { ...filters, page: 1 };
 
