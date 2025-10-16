@@ -41,11 +41,18 @@ export default function SearchBox() {
         openRef.current = false;
     }
 
+    function handleFocus() {
+        // open when the input receives focus (keyboard users/tabbing)
+        setOpen(true);
+        openRef.current = true;
+    }
+
     // handle when press key
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
         // escape 
         if (e.key === "Escape") {
             setOpen(false);
+            openRef.current = false;
             inputRef.current?.blur();
         }
 
@@ -100,13 +107,6 @@ export default function SearchBox() {
         });
     }
 
-    // compute whether there's an active search: server props, input value, or URL query
-    const hasSearch = Boolean(
-        (props && props.filters && props.filters.search) ||
-        (inputRef.current && inputRef.current.value) ||
-        (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('search'))
-    );
-
     return (
         <div className={`search-box ${open ? "open" : ""}`}>
             <button
@@ -150,15 +150,18 @@ export default function SearchBox() {
                 id="search"
                 placeholder="Search"
                 onBlur={handleBlur}
-                onFocus={() => { setOpen(true); openRef.current = true; }}
+                onFocus={handleFocus}
                 onKeyDown={handleKeyDown}
             />
-            {open && hasSearch ? (
+            { open && props && props.filters && props.filters.search ? (
                 <button
                     type="button"
                     className="search-clear ml-2 text-sm text-muted-foreground"
                     aria-label="Clear search"
                     onClick={clearSearch}
+                    onMouseDown={(e) => { e.preventDefault(); }}
+                    tabIndex={0}
+                    role="button"
                 >
                     <i className="fa-solid fa-circle-xmark"></i>
                 </button>
