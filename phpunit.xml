@@ -25,7 +25,7 @@
         <env name="DB_CONNECTION" value="mysql"/>
         <env name="DB_HOST" value="127.0.0.1"/>
         <env name="DB_PORT" value="3306"/>
-        <env name="DB_DATABASE" value="lafins"/>
+        <env name="DB_DATABASE" value="lafins_test"/>
         <env name="DB_USERNAME" value="root"/>
         <env name="DB_PASSWORD" value="Dinhan.0321@"/>
         <env name="MAIL_MAILER" value="array"/>
