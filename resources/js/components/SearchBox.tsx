@@ -1,11 +1,16 @@
 
 import React, { useRef, useState } from "react";
+import { Inertia } from '@inertiajs/inertia';
+import { usePage } from '@inertiajs/react';
 
 export default function SearchBox() {
     // state for open animation
     const [open, setOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const btnRef = useRef<HTMLButtonElement | null>(null);
+
+    // state for search
+    const { props } = usePage();
     
     // funtion for animate
     function animateClick() {
@@ -28,11 +33,32 @@ export default function SearchBox() {
         setOpen(false);
     }
 
+    // handle when press key
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+        // escape 
         if (e.key === "Escape") {
             setOpen(false);
             inputRef.current?.blur();
         }
+
+        if (e.key === 'Enter') {
+            // submit search to server
+            const val = inputRef.current?.value ?? '';
+            const page = 1; // reset to first page on new search
+
+            // preserve other filters if present (read from top-level props)
+            const filters = (props && props.filters) ? props.filters : {};
+            const data = { ...filters, search: val, page };
+            Inertia.get(window.location.pathname, data, { preserveState: false, preserveScroll: true });
+        }
+    }
+
+    function submitSearch() {
+        const val = inputRef.current?.value ?? '';
+        const page = 1;
+        const filters = (props && props.filters) ? props.filters : {};
+        const data = { ...filters, search: val, page };
+        Inertia.get(window.location.pathname, data, { preserveState: false, preserveScroll: true });
     }
 
     return (
@@ -43,7 +69,7 @@ export default function SearchBox() {
                 className="search-icon"
                 aria-label="Open search"
                 aria-expanded={open}
-                onClick={handleIconClick}
+                onClick={() => { animateClick(); if (!open) { handleIconClick() } else { submitSearch() } }}
                 onMouseDown={animateClick}
             >
                 <i className="fa-solid fa-search" aria-hidden />
