@@ -67,28 +67,28 @@ export default function FillterBox({ className, endpoint = '/dashboard' }: Fillt
 
     function applyRange(start: string, end: string, name: string) {
         // Preserve other filters (search, per_page, etc.) and reset to page 1
-        const currentFilters = props?.filters ?? {} as Record<string, any>;
+        const currentFilters = props?.filters ?? {} as Record<string, string | number | undefined>;
         Inertia.get(endpoint, { ...currentFilters, start, end, page: 1 }, { preserveState: false, replace: false });
         setSelected(name);
     }
 
     function applyDay() {
         // Preserve other filters (search, per_page, etc.) and reset to page 1
-        const currentFilters = props?.filters ?? {} as Record<string, any>;
+        const currentFilters = props?.filters ?? {} as Record<string, string | number | undefined>;
         Inertia.get(endpoint, { ...currentFilters, range: 'day', page: 1 }, { preserveState: false, replace: false });
         setSelected('Day');
     }
 
     function applyMonth() {
         // Preserve other filters (search, per_page, etc.) and reset to page 1
-        const currentFilters = props?.filters ?? {} as Record<string, any>;
+        const currentFilters = props?.filters ?? {} as Record<string, string | number | undefined>;
         Inertia.get(endpoint, { ...currentFilters, range: 'month', page: 1 }, { preserveState: false, replace: false });
         setSelected('Month');
     }
 
     function applyYear() {
         // Preserve other filters (search, per_page, etc.) and reset to page 1
-        const currentFilters = props?.filters ?? {} as Record<string, any>;
+        const currentFilters = props?.filters ?? {} as Record<string, string | number | undefined>;
         Inertia.get(endpoint, { ...currentFilters, range: 'year', page: 1 }, { preserveState: false, replace: false });
         setSelected('Year');
     }

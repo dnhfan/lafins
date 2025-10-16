@@ -18,22 +18,27 @@ import PaginationButton from './PaginationButton';
 //           để giữ các bộ lọc hiện tại (controller cần gửi `filters` trong props).
 // Bước 4 - Nếu truyền `buildUrl`, component sẽ dùng hàm đó để điều hướng thay vì basePath + data.
 
-interface LinkItem {
-  url: string | null;
-  label: string;
-  active: boolean;
+interface PaginatorShape {
+  current_page?: number;
+  last_page?: number;
+  last?: number;
+  total?: number;
+  path?: string;
+  meta?: { current_page?: number; last_page?: number };
 }
 
 interface Props {
-  paginator: any;
+  paginator: PaginatorShape | null | undefined;
   buildUrl?: (page: number) => string;
 }
 
 export default function Pagination({ paginator, buildUrl }: Props) {
-    // 1. take props from server
-    const { props } = usePage();
+  // 1. take props from server
+  const { props } = usePage();
 
   if (!paginator) return null;
+
+  const pg: PaginatorShape = paginator;
 
   // Support both shapes: paginator.current_page or paginator.meta.current_page
   const current = Number(paginator.current_page ?? paginator.meta?.current_page ?? 1);
@@ -50,8 +55,8 @@ export default function Pagination({ paginator, buildUrl }: Props) {
   function goTo(page: number) {
     if (page < 1 || page > last || page === current) return;
     // Keep existing filters/query params (server exposes them under props.filters)
-    const basePath = paginator.path ?? window.location.pathname;
-    const filters = (props && (props as any).filters) ? (props as any).filters : {};
+  const basePath = pg.path ?? window.location.pathname;
+  const filters = props && (props as { filters?: Record<string, string | number | undefined> }).filters ? (props as { filters?: Record<string, string | number | undefined> }).filters! : {};
 
     if (buildUrl) {
       const url = buildUrl(page);
@@ -101,7 +106,7 @@ export default function Pagination({ paginator, buildUrl }: Props) {
       </div>
 
       <div className="text-sm text-slate-500">
-        Page {current} of {last} — {paginator.total ?? 0} items
+  Page {current} of {last} — {pg.total ?? 0} items
       </div>
     </nav>
   );
