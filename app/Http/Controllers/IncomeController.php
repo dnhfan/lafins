@@ -72,9 +72,22 @@ class IncomeController extends Controller
             });
         }
 
-        // 6. sorting (only allow safe collums) -> client again hj
+        // 6. sorting (only allow safe collums) 
+        $allowedSorts = ['date', 'amount'];
+        $allowedDirs = ['asc', 'desc'];
 
-        // note: search and sort is using in client bc all the record is pass by server
+        $sortBy = $request->input('sort_by', 'time');  // default: time
+        $sortDir = $request->input('sort_dir', 'desc'); // default: newest/highest first
+
+        // ensure only safe columns/directions
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'date';
+        }
+        if (!in_array($sortDir, $allowedDirs)) {
+            $sortDir = 'desc';
+        }
+
+        $query->orderBy($sortBy, $sortDir);
 
         // 7. pagination
         // số record mỗi trang
@@ -116,7 +129,7 @@ class IncomeController extends Controller
         return Inertia::render('incomes', [
             'incomes' => $incomes,
             // align with other controllers which expose 'filters' (plural)
-            'filters' => $request->only(['range', 'start', 'end', 'search', 'sort_by', 'page', 'per_page']),
+            'filters' => $request->only(['range', 'start', 'end', 'search', 'sort_by','sort_dir', 'page', 'per_page']),
         ]);
     }
 
