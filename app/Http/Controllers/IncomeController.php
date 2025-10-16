@@ -147,6 +147,7 @@ class IncomeController extends Controller
     public function store(Request $request)
     {
         //
+        $data = $request->validated();
     }
 
     /**
