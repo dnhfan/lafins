@@ -22,7 +22,7 @@ interface BaseModalProps {
   onClose: () => void;
   title: string;
   fields: BaseModalField[];
-  initialData?: Record<string, any> | null;
+  initialData?: Partial<Record<string, string | number | null | undefined>> | null;
   onSuccess?: () => void;
   storeUrl: string;
   updateUrl: (id: number) => string;
@@ -58,7 +58,7 @@ export default function BaseModal({
     } else if (type === 'add') {
       reset();
     }
-  }, [initialData, type, isOpen]);
+  }, [initialData, type, isOpen, fields, reset, setData]);
 
   // Handle input change
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
@@ -101,7 +101,7 @@ export default function BaseModal({
   // render view of modal
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
