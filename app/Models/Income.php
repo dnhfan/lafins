@@ -41,57 +41,9 @@ class Income extends Model
      * Scopes
      */
     
-    // Lấy thu nhập theo tháng
-    public function scopeByMonth($query, $month, $year = null)
-    {
-        $year = $year ?? now()->year;
-        return $query->whereMonth('date', $month)
-                    ->whereYear('date', $year);
-    }
-    
     // Lấy thu nhập trong khoảng thời gian
     public function scopeBetweenDates($query, $startDate, $endDate)
     {
         return $query->whereBetween('date', [$startDate, $endDate]);
-    }
-    
-    // Lấy thu nhập theo nguồn
-    public function scopeBySource($query, $source)
-    {
-        return $query->where('source', $source);
-    }
-    
-    // Sắp xếp theo ngày mới nhất
-    public function scopeLatest($query)
-    {
-        return $query->orderBy('date', 'desc');
-    }
-
-    /**
-     * Helper methods
-     */
-    
-    // Format số tiền
-    public function getFormattedAmountAttribute()
-    {
-        return number_format($this->amount, 0, ',', '.') . ' VND';
-    }
-    
-    // Lấy thu nhập hôm nay
-    public static function today()
-    {
-        return static::whereDate('date', today());
-    }
-    
-    // Lấy thu nhập tháng này
-    public static function thisMonth()
-    {
-        return static::byMonth(now()->month, now()->year);
-    }
-    
-    // Lấy thu nhập năm này
-    public static function thisYear()
-    {
-        return static::whereYear('date', now()->year);
     }
 }
