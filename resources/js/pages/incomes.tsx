@@ -1,7 +1,8 @@
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem } from "@/types";
 import { Head, usePage } from "@inertiajs/react";
-import FSbox from "./incomes/FSbox";
+import FSbox from "../components/FSbox";
+import AddIncomeModal from "./incomes/addModal";
 import IncomesTable from "./incomes/IncomesTable";
 import SuccessDialog from "@/components/success-dialog";
 
@@ -21,7 +22,17 @@ export default function Incomes() {
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Incomes" />
                 <main className="flex flex-1 flex-col gap-4 overflow-auto rounded-xl p-4">
-                    <FSbox />
+                    <FSbox
+                        endpoint="/incomes"
+                        addTitle="Add new income"
+                        AddModalComponent={AddIncomeModal}
+                        sortFields={[
+                            { label: 'Date', value: 'date' },
+                            { label: 'Amount', value: 'amount' }
+                        ]}
+                        defaultSortBy="date"
+                        defaultSortDir="desc"
+                    />
                     <IncomesTable />
                 </main>
                 <SuccessDialog message={successMessage ?? undefined} />

@@ -15,6 +15,8 @@ export interface FilterOrderProps {
 	onChange?: (v: FilterOrderValue) => void
 	/** Optional class name for wrapper */
 	className?: string
+	/** Sort fields: array of {label, value} */
+	fields?: Array<{ label: string; value: string }>
 }
 
 /**
@@ -23,11 +25,16 @@ export interface FilterOrderProps {
  *   1) sort by: amount / time
  *   2) sort direction: low -> high (asc) / high -> low (desc)
  */
-export default function FilterOrder({ value, onChange, className }: FilterOrderProps) {
-	const [by, setBy] = useState<SortBy>(value?.by ?? 'date')
-	const [dir, setDir] = useState<SortDir>(value?.dir ?? 'desc')
+export default function FilterOrder({ value, onChange, className, fields }: FilterOrderProps) {
+	const defaultFields = [
+		{ label: 'Date', value: 'date' },
+		{ label: 'Amount', value: 'amount' },
+	];
+	const sortFields = fields && fields.length > 0 ? fields : defaultFields;
+	const [by, setBy] = useState<SortBy | string>(value?.by ?? sortFields[0].value);
+	const [dir, setDir] = useState<SortDir>(value?.dir ?? 'desc');
 	// track first render to avoid emitting onChange on mount
-	const mountedRef = useRef<boolean>(false)
+	const mountedRef = useRef<boolean>(false);
 
 	useEffect(() => {
 		// keep external value in sync when prop changes / take props from server
@@ -44,7 +51,7 @@ export default function FilterOrder({ value, onChange, className }: FilterOrderP
 			mountedRef.current = true;
 			return;
 		}
-		onChange?.({ by, dir })
+	onChange?.({ by: by as SortBy, dir })
 	}, [by, dir, onChange])
 
 		return (
@@ -52,16 +59,17 @@ export default function FilterOrder({ value, onChange, className }: FilterOrderP
 				<div className="filter-row">
 					<label className="filter-control" htmlFor="filter-by">
 						<span className="filter-label"><i className='fa-solid fa-table-list filter-icon' aria-hidden /> Sort by</span>
-						<select
-							id="filter-by"
-							className="filter-select"
-							value={by}
-							onChange={(e) => setBy(e.target.value as SortBy)}
-							aria-label="Sort by"
-						>
-							<option value="date">Date</option>
-							<option value="amount">Amount</option>
-						</select>
+											<select
+												id="filter-by"
+												className="filter-select"
+												value={by}
+												onChange={(e) => setBy(e.target.value)}
+												aria-label="Sort by"
+											>
+												{sortFields.map(f => (
+													<option key={f.value} value={f.value}>{f.label}</option>
+												))}
+											</select>
 					</label>
 
 					<label className="filter-control" htmlFor="filter-dir">
