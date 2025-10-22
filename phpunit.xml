@@ -22,12 +22,18 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
+        <!-- Use SQLite in-memory for GitHub Actions CI/CD -->
+        <!-- For local testing with MySQL, uncomment lines below and comment SQLite lines -->
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <!-- Local MySQL config (uncomment for local dev):
         <env name="DB_CONNECTION" value="mysql"/>
         <env name="DB_HOST" value="127.0.0.1"/>
         <env name="DB_PORT" value="3306"/>
         <env name="DB_DATABASE" value="lafins_test"/>
         <env name="DB_USERNAME" value="root"/>
-        <env name="DB_PASSWORD" value="Dinhan.0321@"/>
+        <env name="DB_PASSWORD" value="YOUR_PASSWORD"/>
+        -->
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
