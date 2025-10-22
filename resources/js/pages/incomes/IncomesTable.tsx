@@ -4,6 +4,8 @@ import { Inertia } from '@inertiajs/inertia';
 import IncomeTableRow from './IncomeTableRow';
 import IncomeModal from '../../components/IncomeModal';
 import Pagination from '../../components/Pagination';
+import IncomeController from '@/actions/App/Http/Controllers/IncomeController';
+
 
 // Kiểu paginator đơn giản
 type Paginator<T> = { data: T[]; meta?: Record<string, unknown> };
@@ -89,9 +91,9 @@ export default function IncomesTable() {
   }
 
   function handleDelete(id: number | string) {
-    if (!confirm('Bạn có chắc muốn xoá mục này?')) return;
-    // Thực hiện xoá bằng Inertia; backend xử lý route tương ứng
-    Inertia.delete(`/incomes/${id}`, { preserveState: false });
+    // Xoá bằng Inertia với type-safe route từ IncomeController
+    const route = IncomeController.destroy(Number(id));
+    Inertia.delete(route.url, { preserveState: false });
   }
 
   return (
