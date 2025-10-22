@@ -1,8 +1,9 @@
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem } from "@/types";
-import { Head } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import FSbox from "./incomes/FSbox";
 import IncomesTable from "./incomes/IncomesTable";
+import SuccessDialog from "@/components/success-dialog";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -12,6 +13,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Incomes() {
+    const { props } = usePage<{ flash?: { success?: string | null } } & Record<string, unknown>>();
+    const successMessage = (props?.flash as any)?.success as string | undefined;
 
     return (
         <>
@@ -21,6 +24,7 @@ export default function Incomes() {
                     <FSbox />
                     <IncomesTable />
                 </main>
+                <SuccessDialog message={successMessage ?? undefined} />
                 
             </AppLayout> 
         </>
