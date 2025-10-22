@@ -44,10 +44,13 @@ export interface User {
 
 export interface Jar {
   id: number;
+  label: string; // Jar name (NEC, FFA, EDU, LTSS, PLAY, GIVE)
   key: string;
-  label: string // nếu backend không có, để optional
-  percentage: number
-  balance: number
+  percentage: number;
+  balance: number;
+  user_id?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Page props for a page that includes jars payload.
