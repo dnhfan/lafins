@@ -16,6 +16,24 @@ class IncomeController extends Controller
     }
 
     /**
+     * Extract current filters from the Referer URL so redirects can preserve them.
+     */
+    private function extractFiltersFromReferer(Request $request): array
+    {
+        $referer = $request->headers->get('referer');
+        if (!$referer) return [];
+
+        $queryString = parse_url($referer, PHP_URL_QUERY);
+        if (!$queryString) return [];
+
+        parse_str($queryString, $params);
+        if (!is_array($params)) return [];
+
+        $allowed = ['range', 'start', 'end', 'search', 'sort_by', 'sort_dir', 'page', 'per_page'];
+        return array_intersect_key($params, array_flip($allowed));
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -155,14 +173,19 @@ class IncomeController extends Controller
         
         // 3. create income
         $income = Income::create([
-            'user_id' => $request->user()->id,
+            'user_id' => auth()->id(),
             'date' => $data['date'],
             'source' => $data['source'],
             'description' => $data['description'] ?? null,
             'amount' => $data['amount'],            
         ]);
 
-        return redirect() -> route('incomes')->with('success', 'added income!');
+        // Redirect back with current filters (from referer) to keep view state; fallback to sensible defaults
+        $filters = $this->extractFiltersFromReferer($request);
+        if (empty($filters)) {
+            $filters = ['range' => 'day', 'page' => 1];
+        }
+        return redirect()->route('incomes', $filters)->with('success', 'added income!');
     }
 
     /**
@@ -192,8 +215,21 @@ class IncomeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Income $income)
     {
-        //
+        // 1. Authorize: ensure the income belongs to current user
+        if ($income->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // 2. Delete
+        $income->delete();
+
+        // 3. Redirect back to list with success message, preserving current filters from referer
+        $filters = $this->extractFiltersFromReferer(request());
+        if (empty($filters)) {
+            $filters = ['range' => 'day', 'page' => 1];
+        }
+        return redirect()->route('incomes', $filters)->with('success', 'Deleted income');
     }
 }
