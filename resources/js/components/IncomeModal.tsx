@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import IncomeController from '../actions/App/Http/Controllers/IncomeController';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
+import { Button } from './ui/button';
 
 type ModalType = 'add' | 'update';
 
@@ -60,7 +62,7 @@ export default function IncomeModal({ type, isOpen, onClose, initialData = null,
     // type = add -> post 
     if (type === 'add') {
       post(IncomeController.store.url(), {
-        preserveState: false,
+        preserveScroll: true,
         onSuccess: () => {
           onClose();
           onSuccess?.();
@@ -70,8 +72,8 @@ export default function IncomeModal({ type, isOpen, onClose, initialData = null,
     } else {
       const id = initialData?.id;
       if (!id) return;
-      put(`/incomes/${id}`, {
-        preserveState: false,
+      put(IncomeController.update.url(Number(id)), {
+        preserveScroll: true,
         onSuccess: () => {
           onClose();
           onSuccess?.();
@@ -82,53 +84,48 @@ export default function IncomeModal({ type, isOpen, onClose, initialData = null,
 
   // Keep the modal mounted to allow simple CSS transitions on open/close
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`} aria-hidden={!isOpen}>
-       {/* wrapper   */}
-      <div
-        className={`fixed inset-0 bg-black/40 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
-        onClick={onClose}
-      />
-
-      {/* Main modal   */}
-      <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-lg w-full max-w-xl mx-4 z-10 transform transition-all duration-200 ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'}`}>
-        {/* header */}
-        <div className="p-4 border-b dark:border-slate-700 flex items-center justify-between">
-          <h3 className="text-lg font-medium">{type === 'add' ? 'Add Income' : 'Edit Income'}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-700">×</button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle>{type === 'add' ? 'Add Income' : 'Edit Income'}</DialogTitle>
+        </DialogHeader>
+        
         {/* form */}
-        <form onSubmit={handleSubmit} className="p-4 space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-600">Date</label>
-            <input name="date" type="date" value={data.date} onChange={change} className="mt-1 w-full rounded border px-2 py-1" />
-            {errors.date && <div className="text-red-500 text-sm">{String(errors.date)}</div>}
+            <label className="block text-sm font-medium mb-1">Date</label>
+            <input name="date" type="date" value={data.date} onChange={change} className="w-full rounded-md border px-3 py-2" />
+            {errors.date && <div className="text-red-500 text-sm mt-1">{String(errors.date)}</div>}
           </div>
 
           <div>
-            <label className="block text-sm text-slate-600">Category / Source</label>
-            <input name="source" value={data.source} onChange={change} className="mt-1 w-full rounded border px-2 py-1" />
-            {errors.source && <div className="text-red-500 text-sm">{String(errors.source)}</div>}
+            <label className="block text-sm font-medium mb-1">Category / Source</label>
+            <input name="source" value={data.source} onChange={change} className="w-full rounded-md border px-3 py-2" />
+            {errors.source && <div className="text-red-500 text-sm mt-1">{String(errors.source)}</div>}
           </div>
 
           <div>
-            <label className="block text-sm text-slate-600">Description</label>
-            <textarea name="description" value={data.description} onChange={change} className="mt-1 w-full rounded border px-2 py-1" />
-            {errors.description && <div className="text-red-500 text-sm">{String(errors.description)}</div>}
+            <label className="block text-sm font-medium mb-1">Description</label>
+            <textarea name="description" value={data.description} onChange={change} className="w-full rounded-md border px-3 py-2 min-h-[80px]" />
+            {errors.description && <div className="text-red-500 text-sm mt-1">{String(errors.description)}</div>}
           </div>
 
           <div>
-            <label className="block text-sm text-slate-600">Amount</label>
-            <input name="amount" type="number" value={data.amount} onChange={change} className="mt-1 w-full rounded border px-2 py-1" />
-            {errors.amount && <div className="text-red-500 text-sm">{String(errors.amount)}</div>}
+            <label className="block text-sm font-medium mb-1">Amount</label>
+            <input name="amount" type="number" value={data.amount} onChange={change} className="w-full rounded-md border px-3 py-2" />
+            {errors.amount && <div className="text-red-500 text-sm mt-1">{String(errors.amount)}</div>}
           </div>
 
-          <div className="flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-3 py-1 rounded border">Cancel</button>
-            <button type="submit" disabled={processing} className="px-3 py-1 rounded bg-blue-600 text-white">{processing ? 'Saving...' : 'Save'}</button>
-          </div>
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={processing}>
+              {processing ? 'Saving...' : 'Save'}
+            </Button>
+          </DialogFooter>
         </form>
-
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
