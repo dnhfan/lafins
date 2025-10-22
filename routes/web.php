@@ -20,6 +20,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update');
 
     Route::get('outcomes', [OutcomeController::class, 'index'])->name('outcomes');
+    Route::post('outcomes', [OutcomeController::class, 'store'])->name('outcomes.store');
+    Route::put('outcomes/{outcome}', [OutcomeController::class, 'update'])->name('outcomes.update');
+    Route::delete('outcomes/{outcome}', [OutcomeController::class, 'destroy'])->name('outcomes.destroy');
 });
 
 require __DIR__.'/settings.php';
