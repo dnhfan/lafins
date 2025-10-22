@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-export type SortBy = 'amount' | 'date'
+export type SortBy = string
 export type SortDir = 'asc' | 'desc'
 
 export interface FilterOrderValue {
@@ -31,7 +31,7 @@ export default function FilterOrder({ value, onChange, className, fields }: Filt
 		{ label: 'Amount', value: 'amount' },
 	];
 	const sortFields = fields && fields.length > 0 ? fields : defaultFields;
-	const [by, setBy] = useState<SortBy | string>(value?.by ?? sortFields[0].value);
+	const [by, setBy] = useState<SortBy>(value?.by ?? sortFields[0].value);
 	const [dir, setDir] = useState<SortDir>(value?.dir ?? 'desc');
 	// track first render to avoid emitting onChange on mount
 	const mountedRef = useRef<boolean>(false);
@@ -51,7 +51,7 @@ export default function FilterOrder({ value, onChange, className, fields }: Filt
 			mountedRef.current = true;
 			return;
 		}
-	onChange?.({ by: by as SortBy, dir })
+	onChange?.({ by, dir })
 	}, [by, dir, onChange])
 
 		return (

@@ -3,7 +3,7 @@ import FillterBox from "./FilterBox";
 import SearchBox from "./SearchBox";
 import FillterOrder from "./filter-order";
 import AddBtn from "./add-btn";
-import { useState, ReactNode } from 'react';
+import { useState } from 'react';
 import { router, usePage } from "@inertiajs/react";
 
 type FSboxProps = {
@@ -62,8 +62,8 @@ export default function FSbox({
                 <div className="fsbox-right">
                     <FillterOrder
                         value={{
-                            by: String(filters?.sort_by ?? defaultSortBy) as any,
-                            dir: String(filters?.sort_dir ?? defaultSortDir) as any,
+                            by: String(filters?.sort_by ?? defaultSortBy),
+                            dir: (String(filters?.sort_dir ?? defaultSortDir) === 'asc' ? 'asc' : 'desc'),
                         }}
                         onChange={handleSortChange}
                         fields={sortFields}
