@@ -69,7 +69,8 @@ export default function FillterBox({ className, endpoint = '/dashboard' }: Fillt
         // Preserve other filters (search, per_page, etc.) and reset to page 1
         const currentFilters = props?.filters ?? ({} as Record<string, string | number | undefined>);
         // Remove any existing 'range' when applying custom start/end
-        const { range: _range, ...rest } = currentFilters as Record<string, string | number | undefined>;
+        const rest = { ...(currentFilters as Record<string, string | number | undefined>) };
+        delete (rest as Record<string, unknown>).range;
         Inertia.get(
             endpoint,
             { ...rest, start, end, page: 1 },
@@ -82,7 +83,9 @@ export default function FillterBox({ className, endpoint = '/dashboard' }: Fillt
         // Preserve other filters (search, per_page, etc.) and reset to page 1
         const currentFilters = props?.filters ?? ({} as Record<string, string | number | undefined>);
         // Remove custom start/end when using preset range
-        const { start: _s, end: _e, ...rest } = currentFilters as Record<string, string | number | undefined>;
+        const rest = { ...(currentFilters as Record<string, string | number | undefined>) };
+        delete (rest as Record<string, unknown>).start;
+        delete (rest as Record<string, unknown>).end;
         Inertia.get(
             endpoint,
             { ...rest, range: 'day', page: 1 },
@@ -94,7 +97,9 @@ export default function FillterBox({ className, endpoint = '/dashboard' }: Fillt
     function applyMonth() {
         // Preserve other filters (search, per_page, etc.) and reset to page 1
         const currentFilters = props?.filters ?? ({} as Record<string, string | number | undefined>);
-        const { start: _s, end: _e, ...rest } = currentFilters as Record<string, string | number | undefined>;
+        const rest = { ...(currentFilters as Record<string, string | number | undefined>) };
+        delete (rest as Record<string, unknown>).start;
+        delete (rest as Record<string, unknown>).end;
         Inertia.get(
             endpoint,
             { ...rest, range: 'month', page: 1 },
@@ -106,7 +111,9 @@ export default function FillterBox({ className, endpoint = '/dashboard' }: Fillt
     function applyYear() {
         // Preserve other filters (search, per_page, etc.) and reset to page 1
         const currentFilters = props?.filters ?? ({} as Record<string, string | number | undefined>);
-        const { start: _s, end: _e, ...rest } = currentFilters as Record<string, string | number | undefined>;
+        const rest = { ...(currentFilters as Record<string, string | number | undefined>) };
+        delete (rest as Record<string, unknown>).start;
+        delete (rest as Record<string, unknown>).end;
         Inertia.get(
             endpoint,
             { ...rest, range: 'year', page: 1 },
