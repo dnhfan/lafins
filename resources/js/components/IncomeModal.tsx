@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
+import IncomeController from '../actions/App/Http/Controllers/IncomeController';
 
 type ModalType = 'add' | 'update';
 
@@ -58,7 +59,7 @@ export default function IncomeModal({ type, isOpen, onClose, initialData = null,
 
     // type = add -> post 
     if (type === 'add') {
-      post('/incomes', {
+      post(IncomeController.store.url(), {
         preserveState: false,
         onSuccess: () => {
           onClose();
