@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IncomeStoreRequest;
 use App\Models\Income;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -144,10 +145,24 @@ class IncomeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(IncomeStoreRequest $request)
     {
-        //
+        // 1. take data from request + validate
         $data = $request->validated();
+
+        // 2. int casting 'amount'
+        $data['amount'] = (int) round($data['amount']);
+        
+        // 3. create income
+        $income = Income::create([
+            'user_id' => $request->user()->id,
+            'date' => $data['date'],
+            'source' => $data['source'],
+            'description' => $data['description'] ?? null,
+            'amount' => $data['amount'],            
+        ]);
+
+        return redirect() -> route('incomes')->with('success', 'added income!');
     }
 
     /**
