@@ -1,5 +1,6 @@
 
 import ActionButton from '@/components/ActionButton';
+import DeleteRow from '@/components/delete-row';
 
 interface Income {
   id: number | string;
@@ -36,10 +37,7 @@ export default function IncomeTableRow({ item, idx, onEdit, onDelete, formatCurr
             <i className="fa-solid fa-pencil " />
             <span className="hidden sm:inline">Edit</span>
           </ActionButton>
-          <ActionButton variant="danger" title="Delete" onClick={() => onDelete(item.id)}>
-            <i className="fa-solid fa-trash" />
-            <span className="hidden sm:inline">Delete</span>
-          </ActionButton>
+          <DeleteRow onConfirm={() => onDelete(item.id)} />
         </>
       </td>
     </tr>
