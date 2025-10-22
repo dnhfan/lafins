@@ -8,31 +8,18 @@ use App\Models\Income;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Controllers\Concerns\PreservesFilters;
+use App\Http\Controllers\Concerns\BuildsFinancialQuery;
 
 class IncomeController extends Controller
 {
+    use PreservesFilters;
+    use BuildsFinancialQuery;
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Extract current filters from the Referer URL so redirects can preserve them.
-     */
-    private function extractFiltersFromReferer(Request $request): array
-    {
-        $referer = $request->headers->get('referer');
-        if (!$referer) return [];
-
-        $queryString = parse_url($referer, PHP_URL_QUERY);
-        if (!$queryString) return [];
-
-        parse_str($queryString, $params);
-        if (!is_array($params)) return [];
-
-        $allowed = ['range', 'start', 'end', 'search', 'sort_by', 'sort_dir', 'page', 'per_page'];
-        return array_intersect_key($params, array_flip($allowed));
-    }
 
     /**
      * Display a listing of the resource.
@@ -49,104 +36,28 @@ class IncomeController extends Controller
             return redirect()->route('incomes', ['range' => 'day', 'page' => 1]);
         }
 
-        // 3. Range preset (day/month/year)
-        if ($request->filled('range')) {
-            // if range isset
-            $now = Carbon::now();
-            if ($request->range === 'day') {
-                $start = $now->startOfDay()->toDateString();
-                $end = $now->endOfDay()->toDateString();
-            } elseif ($request->range === 'month') {
-                $start = $now->startOfMonth()->toDateString();
-                $end = $now->endOfMonth()->toDateString();
-            } elseif ($request->range === 'year') {
-                $start = $now->startOfYear()->toDateString();
-                $end = $now->endOfYear()->toDateString();
-            }
-            // not have preset
-            if (isset($start, $end)) {
-                $query->whereBetween('date', [$start, $end]);
-            }
-        }
-        
-        // 4. using TimeRangeModel (start/end) only when no preset range is provided
-        if (! $request->filled('range') && ($request->filled('start') || $request->filled('end'))) {
-            $start = $request->input('start') ?? '1974-01-01';
-            $end = $request->input('end') ?? Carbon::today()->toDateString();
-
-            // protected
-            $end = min($end, Carbon::today()->toDateString()); // ngày end không được lớn hơn hôm hôm nay
-            if($start > $end) $start = $end; // start > end -> fillter only end day
-            $query->whereBetween('date', [$start, $end]);
-        }
-
-        // 5. search (server-side): support searching by `source` or `description`
-        if ($request->filled('search')) {
-            $term = $request->input('search');
-            $query->where(function ($q) use ($term) {
-                $q->where('source', 'like', "%{$term}%")
-                  ->orWhere('description', 'like', "%{$term}%");
-            });
-        }
-
-        // 6. sorting (only allow safe collums) 
-        $allowedSorts = ['date', 'amount'];
-        $allowedDirs = ['asc', 'desc'];
-
-        $sortBy = $request->input('sort_by', 'time');  // default: time
-        $sortDir = $request->input('sort_dir', 'desc'); // default: newest/highest first
-
-        // ensure only safe columns/directions
-        if (!in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'date';
-        }
-        if (!in_array($sortDir, $allowedDirs)) {
-            $sortDir = 'desc';
-        }
-
-        $query->orderBy($sortBy, $sortDir);
+        // 3-6. Apply common filters (range, date, search, sort) via trait
+        $query = $this->applyFinancialFilters(
+            $query,
+            $request,
+            ['source', 'description'], // searchable columns
+            'date', // default sort by
+            'desc'  // default sort direction
+        );
 
         // 7. pagination
-        // số record mỗi trang
         $perPage = (int) $request->input('per_page', 15);
-        
-        // apply a sensible default sort (newest first) and keep query string on paginator
-        $incomes = $query->latest()->paginate($perPage)->withQueryString();
-        // note: cuối cùng sau 7749 cái lọc thì query mới hoàn thiện và được gán vào incomes
+        $incomes = $query->paginate($perPage)->withQueryString();
 
-        /*
-        - $query ở đây là query builder đã được build từ đầu (có thể đã có where, filter, sort...).
-        - Hàm paginate($perPage) là Eloquent pagination, Laravel sẽ tự động:
-            1. Lấy $perPage bản ghi đầu tiên (ví dụ 15 bản ghi).
-            2. Tính tổng số bản ghi (SELECT count(*)).
-            3. Tạo các thuộc tính tiện ích như:
-                $incomes->currentPage() – trang hiện tại.
-                $incomes->lastPage() – tổng số trang.
-                $incomes->total() – tổng số bản ghi.
-                $incomes->nextPageUrl() – URL của trang kế tiếp.
-                $incomes->previousPageUrl() – URL của trang trước đó.
-            4. Trả về một object LengthAwarePaginator, chứ không phải chỉ là một collection.
-         */
-    
-        // 8. transform collection -> Gửi chỉ field cần + formatted_amount
-        $incomes->getCollection()->transform(function ($inc) {
-            return [
-                'id' => $inc->id,
-                // make date handling defensive in case it's null/not a Carbon instance
-                'date' => $inc->date ? $inc->date->format('Y-m-d') : null,
-                'source' => $inc->source,
-                'description' => $inc->description,
-                'amount' => $inc->amount,
-                // cast amount to float before formatting (casts may return string)
-                'formatted_amount' => number_format((float) $inc->amount, 0, ',', '.') . ' ₫',
-            ];
-        });
+        // 8. transform collection -> Send only needed fields + formatted_amount
+        $this->transformFinancialCollection($incomes, ['id', 'date', 'source', 'description', 'amount']);
 
-        // 9. Return Inertia page với props incomes(paginator) + fillters
+        // 9. Return Inertia page with props incomes(paginator) + filters
         return Inertia::render('incomes', [
             'incomes' => $incomes,
-            // align with other controllers which expose 'filters' (plural)
-            'filters' => $request->only(['range', 'start', 'end', 'search', 'sort_by','sort_dir', 'page', 'per_page']),
+            'filters' => $this->canonicalizeFilters(
+                $request->only(['range', 'start', 'end', 'search', 'sort_by','sort_dir', 'page', 'per_page'])
+            ),
         ]);
     }
 
