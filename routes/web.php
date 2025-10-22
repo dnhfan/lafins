@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('incomes', [IncomeController::class, 'index'])->name('incomes');
     Route::post('incomes', [IncomeController::class, 'store'])->name('incomes.store');
+    Route::delete('incomes/{income}', [IncomeController::class, 'destroy'])->name('incomes.destroy');
 });
 
 require __DIR__.'/settings.php';
