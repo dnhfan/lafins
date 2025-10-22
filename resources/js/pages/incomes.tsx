@@ -13,8 +13,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Incomes() {
-    const { props } = usePage<{ flash?: { success?: string | null } } & Record<string, unknown>>();
-    const successMessage = (props?.flash as any)?.success as string | undefined;
+    const { props } = usePage<{ flash?: { success?: string | null; error?: string | null; status?: string | null } } & Record<string, unknown>>();
+    const successMessage = props?.flash?.success ?? undefined;
 
     return (
         <>
