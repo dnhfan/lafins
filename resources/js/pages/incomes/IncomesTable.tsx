@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
-import IncomeTableRow from './IncomeTableRow';
 import IncomeModal from '../../components/IncomeModal';
-import Pagination from '../../components/Pagination';
 import IncomeController from '@/actions/App/Http/Controllers/IncomeController';
+import BaseResourceTable, { Column } from '@/components/BaseResourceTable';
 
 
 // Kiểu paginator đơn giản
@@ -96,49 +95,35 @@ export default function IncomesTable() {
     Inertia.delete(route.url, { preserveState: false });
   }
 
+  const columns: Column<Income>[] = [
+    { key: 'date', header: 'Date' },
+    { key: 'source', header: 'Category' },
+    { key: 'description', header: 'Description', className: 'truncate max-w-[28rem]' },
+    {
+      key: 'amount',
+      header: 'Amount',
+      align: 'right',
+      render: (item) => item.formatted_amount ?? formatCurrency(item.amount ?? 0),
+    },
+  ];
+
   return (
     <>
-      {/* Bảng thu nhập */}
       {loading ? (
         <p className="text-center py-6">Loading...</p>
       ) : error ? (
         <p className="text-center text-red-500 py-6">Lỗi: {String(error)}</p>
       ) : (
-        <div className="overflow-x-auto">
-          <div className="bg-white dark:bg-slate-800 border rounded-lg shadow-sm overflow-hidden">
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-50 dark:bg-slate-700">
-                <tr className="text-left text-xs uppercase text-slate-500">
-                  <th className="p-3 sticky top-0">Date</th>
-                  <th className="p-3 sticky top-0">Category</th>
-                  <th className="p-3 sticky top-0">Description</th>
-                  <th className="p-3 sticky top-0 text-right">Amount</th>
-                  <th className="p-3 sticky top-0 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((i: Income, idx: number) => (
-                  <IncomeTableRow
-                    key={i.id}
-                    item={i}
-                    idx={idx}
-                    onEdit={(item) => setEditing(item)}
-                    onDelete={(id) => handleDelete(id)}
-                    formatCurrency={formatCurrency}
-                  />
-                ))}
-              </tbody>
-            </table>
-            {Array.isArray(filtered) && filtered.length === 0 && (
-              <div className="p-6 text-center text-sm text-slate-500">You dont have any incomes :) .</div>
-            )}
-              {/* Pagination controls (server-driven) */}
-              {isPag && (
-                <Pagination paginator={raw as PaginatorShape} />
-              )}
-          </div>
-        </div>
+        <BaseResourceTable<Income>
+          data={filtered}
+          columns={columns}
+          onEdit={(item) => setEditing(item)}
+          onDelete={(id) => handleDelete(id)}
+          emptyMessage={'You dont have any incomes :) .'}
+          paginator={isPag ? (raw as PaginatorShape) : undefined}
+        />
       )}
+
       {/* Update modal: open when editing is set */}
       <IncomeModal
         type="update"
