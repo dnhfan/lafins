@@ -8,9 +8,11 @@ use App\Models\Income;
 use App\Models\Outcome;
 use App\Models\Jar;
 use Carbon\Carbon;
+use App\Http\Controllers\Concerns\PreservesFilters as PreservesFiltersTrait;
 
 class DashboardController extends Controller
 {
+    use PreservesFiltersTrait;
     /**
      * Show dashboard summary (balance, income, outcome) for a date range.
      * Accepts optional `start` and `end` query params (YYYY-MM-DD).
@@ -117,6 +119,14 @@ class DashboardController extends Controller
 
         // debug:
 
+        // Build filters to ensure mutual exclusivity between 'range' and 'start/end'
+        $filters = $appliedRange
+            ? ['range' => $appliedRange]
+            : ['start' => $start, 'end' => $end];
+
+        // Final guard (in case logic above changes), canonicalize filters
+        $filters = $this->canonicalizeFilters($filters);
+
         return Inertia::render('dashboard', [
             'summary' => [
                 'total_balance' => $totalBalance,
@@ -125,7 +135,7 @@ class DashboardController extends Controller
             ],
             'jars' => $jarConfigs,
             'jar_meta' => $jarMeta,
-            'filters' => ['start' => $start, 'end' => $end, 'range' => $appliedRange],
+            'filters' => $filters,
         ]);
     }
 }
