@@ -1,10 +1,9 @@
 import FSbox from "@/components/FSbox";
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem } from "@/types";
-import { Head, usePage } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import AddOutcomeModal from "./outcomes/AddOutcomeModal";
 import OutcomeTable from "./outcomes/OutcomeTable";
-import type { Jar } from "@/types";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,14 +12,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface OutcomesPageProps {
-    jars?: Jar[];
-    [key: string]: unknown;
-}
 
 export default function Outcomes() {
-    const { props } = usePage<OutcomesPageProps>();
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Outcomes" />
