@@ -19,8 +19,8 @@ type Props = {
 // SuccessDialog: show a modal when message is provided, allows user to confirm/close.
 export default function SuccessDialog({
   message,
-  title = 'Thành công',
-  confirmText = 'Xác nhận',
+  title = 'Success',
+  confirmText = 'Confirm',
   onClose,
 }: Props) {
   const [open, setOpen] = useState<boolean>(Boolean(message));

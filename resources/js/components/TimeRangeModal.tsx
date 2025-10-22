@@ -101,36 +101,36 @@ export default function TimeRangeModal({ onApply, onCancel, triggerLabel = 'Opti
       )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
-          <DialogTitle>Chọn khoảng thời gian</DialogTitle>
-          <DialogDescription>Chọn ngày bắt đầu và kết thúc hoặc dùng các lựa chọn nhanh.</DialogDescription>
+          <DialogTitle>Select Time Range</DialogTitle>
+          <DialogDescription>Choose start and end dates or use quick options.</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-3 py-2">
           <div className="grid grid-cols-2 gap-2">
             <label className="flex flex-col">
-              <span className="text-sm text-muted-foreground">Bắt đầu</span>
+              <span className="text-sm text-muted-foreground">Start</span>
               <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className="mt-1 rounded-md border px-2 py-1" />
             </label>
             <label className="flex flex-col">
-              <span className="text-sm text-muted-foreground">Kết thúc</span>
+              <span className="text-sm text-muted-foreground">End</span>
               <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} className="mt-1 rounded-md border px-2 py-1" />
             </label>
           </div>
 
           <div className="flex gap-2 flex-wrap">
-            <button type="button" onClick={() => applyPreset(7)} className="text-sm px-2 py-1 rounded-md border bg-transparent hover:bg-muted">7 ngày</button>
-            <button type="button" onClick={() => applyPreset(30)} className="text-sm px-2 py-1 rounded-md border bg-transparent hover:bg-muted">30 ngày</button>
-            <button type="button" onClick={() => applyPreset(90)} className="text-sm px-2 py-1 rounded-md border bg-transparent hover:bg-muted">90 ngày</button>
-            <button type="button" onClick={() => { const d = new Date(); setStart(toInputDate(new Date(d.getFullYear(), d.getMonth(), 1))); setEnd(toInputDate(new Date())); }} className="text-sm px-2 py-1 rounded-md border bg-transparent hover:bg-muted">Tháng này</button>
+            <button type="button" onClick={() => applyPreset(7)} className="text-sm px-2 py-1 rounded-md border bg-transparent hover:bg-muted">7 days</button>
+            <button type="button" onClick={() => applyPreset(30)} className="text-sm px-2 py-1 rounded-md border bg-transparent hover:bg-muted">30 days</button>
+            <button type="button" onClick={() => applyPreset(90)} className="text-sm px-2 py-1 rounded-md border bg-transparent hover:bg-muted">90 days</button>
+            <button type="button" onClick={() => { const d = new Date(); setStart(toInputDate(new Date(d.getFullYear(), d.getMonth(), 1))); setEnd(toInputDate(new Date())); }} className="text-sm px-2 py-1 rounded-md border bg-transparent hover:bg-muted">This month</button>
           </div>
         </div>
 
         <DialogFooter className="gap-2">
           <DialogClose asChild>
-            <button type="button" className="px-3 py-2 rounded-md border">Hủy</button>
+            <button type="button" className="px-3 py-2 rounded-md border">Cancel</button>
           </DialogClose>
           <DialogClose asChild>
-            <button type="button" onClick={apply} className="px-3 py-2 rounded-md bg-primary text-primary-foreground">Áp dụng</button>
+            <button type="button" onClick={apply} className="px-3 py-2 rounded-md bg-primary text-primary-foreground">Apply</button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

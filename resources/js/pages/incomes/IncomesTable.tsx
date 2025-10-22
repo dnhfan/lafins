@@ -130,7 +130,7 @@ export default function IncomesTable() {
               </tbody>
             </table>
             {Array.isArray(filtered) && filtered.length === 0 && (
-              <div className="p-6 text-center text-sm text-slate-500">Không có mục thu nhập nào.</div>
+              <div className="p-6 text-center text-sm text-slate-500">You dont have any incomes :) .</div>
             )}
               {/* Pagination controls (server-driven) */}
               {isPag && (

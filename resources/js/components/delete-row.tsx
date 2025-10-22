@@ -27,10 +27,10 @@ type Props = {
 // On confirm, calls onConfirm() provided by parent.
 export default function DeleteRow({
 	onConfirm,
-	title = 'Xoá mục này?',
-	description = 'Hành động này không thể hoàn tác. Bạn có chắc muốn xoá? ',
-	confirmText = 'Xoá',
-	cancelText = 'Huỷ',
+	title = 'Delete this item?',
+	description = 'This action cannot be undone. Are you sure you want to delete?',
+	confirmText = 'Delete',
+	cancelText = 'Cancel',
 	disabled = false,
 	className = '',
 }: Props) {
@@ -80,7 +80,7 @@ export default function DeleteRow({
 						onClick={handleConfirm}
 						disabled={processing || disabled}
 					>
-						{processing ? 'Đang xoá…' : confirmText}
+						{processing ? 'Deleting…' : confirmText}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
