@@ -145,7 +145,7 @@ export default function IncomesTable() {
         isOpen={Boolean(editing)}
         onClose={() => setEditing(null)}
         initialData={editing}
-        onSuccess={() => { setEditing(null); Inertia.reload(); }}
+        onSuccess={() => { setEditing(null);}}
       />
     </>
   );
