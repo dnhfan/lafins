@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\IncomeStoreRequest;
+use App\Http\Requests\IncomeUpdateRequest;
 use App\Models\Income;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -43,10 +44,7 @@ class IncomeController extends Controller
         // 2. base query
         $query = Income::where('user_id', $user->id);
 
-        // If user navigates to /incomes without any range/start/end/page params,
-        // redirect them to the default view: range=day and page=1.
-        // This provides a consistent initial state and avoids showing an empty
-        // unfiltered list.
+        // default route
         if (! $request->filled('range') && ! $request->filled('start') && ! $request->filled('end') && ! $request->filled('page')) {
             return redirect()->route('incomes', ['range' => 'day', 'page' => 1]);
         }
@@ -153,14 +151,6 @@ class IncomeController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(IncomeStoreRequest $request)
@@ -188,28 +178,30 @@ class IncomeController extends Controller
         return redirect()->route('incomes', $filters)->with('success', 'added income!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(IncomeUpdateRequest $request, Income $income)
     {
-        //
+        // 1. Authorize: ensure the income belongs to current user
+        if ($income->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $data = $request->validated();
+
+        // 2. int casting 'amount'
+        $data['amount'] = (int) round($data['amount']);
+
+        $income->update($data);
+        
+        $filters = $this->extractFiltersFromReferer($request);
+        if (empty($filters)) {
+            $filters = ['range' => 'day', 'page' => 1];
+        }
+
+        return redirect()->route('incomes', $filters) -> with('success', 'Updated income!');
     }
 
     /**
