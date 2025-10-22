@@ -24,6 +24,8 @@ interface Outcome {
 	id: number | string;
 	date?: string;
 	category?: string;
+	jar_id?: number | string | null;
+	jar_label?: string;
 	description?: string;
 	amount?: number | string;
 	formatted_amount?: string;
@@ -70,6 +72,11 @@ export default function OutcomeTable() {
 	const columns: Column<Outcome>[] = [
 		{ key: 'date', header: 'Date' },
 		{ key: 'category', header: 'Category' },
+		{ 
+			key: 'jar_label', 
+			header: 'Jar', 
+			render: (item) => item.jar_label || 'None'
+		},
 		{ key: 'description', header: 'Description', className: 'truncate max-w-[28rem]' },
 		{
 			key: 'amount',

@@ -1,4 +1,7 @@
 import BaseModal, { BaseModalField } from './BaseModal';
+import { usePage } from '@inertiajs/react';
+import type { Jar } from '@/types';
+import OutcomeController from '@/actions/App/Http/Controllers/OutcomeController';
 
 type ModalType = 'add' | 'update';
 
@@ -12,37 +15,48 @@ interface OutcomeModalProps {
     category?: string;
     description?: string;
     amount?: number | string;
+    jar_id?: number | string | null;
   } | null;
   onSuccess?: () => void;
 }
 
-const outcomeFields: BaseModalField[] = [
-  {
-    name: 'date',
-    label: 'Date',
-    type: 'date',
-    required: true,
-  },
-  {
-    name: 'category',
-    label: 'Category',
-    type: 'text',
-    required: true,
-  },
-  {
-    name: 'description',
-    label: 'Description',
-    type: 'textarea',
-  },
-  {
-    name: 'amount',
-    label: 'Amount',
-    type: 'number',
-    required: true,
-  },
-];
-
 export default function OutcomeModal({ type, isOpen, onClose, initialData = null, onSuccess }: OutcomeModalProps) {
+  const { props } = usePage<{ jars?: Jar[] }>();
+  const jars = props?.jars ?? [];
+
+  const outcomeFields: BaseModalField[] = [
+    {
+      name: 'date',
+      label: 'Date',
+      type: 'date',
+      required: true,
+    },
+    {
+      name: 'category',
+      label: 'Category',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'jar_id',
+      label: 'Jar',
+      type: 'select',
+      required: true,
+      options: jars.map((jar) => ({ label: jar.name || jar.id.toString(), value: jar.id })),
+    },
+    {
+      name: 'description',
+      label: 'Description',
+      type: 'textarea',
+    },
+    {
+      name: 'amount',
+      label: 'Amount',
+      type: 'number',
+      required: true,
+    },
+  ];
+
   return (
     <BaseModal
       type={type}
@@ -52,8 +66,8 @@ export default function OutcomeModal({ type, isOpen, onClose, initialData = null
       fields={outcomeFields}
       initialData={initialData}
       onSuccess={onSuccess}
-      storeUrl="/outcomes"
-      updateUrl={(id: number) => `/outcomes/${id}`}
+      storeUrl={OutcomeController.store.url()}
+      updateUrl={(id) => OutcomeController.update.url(id)}
     />
   );
 }
