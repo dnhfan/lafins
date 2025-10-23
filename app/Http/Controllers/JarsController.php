@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Jar;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class JarsController extends Controller
 {
@@ -58,16 +59,64 @@ class JarsController extends Controller
 
         $percentages = $payload['percentages'];
 
-        foreach ($percentages as $jarId => $percent) {
-            $jar = Jar::where('user_id', $user->id)->where('id', $jarId)->first();
-            if ($jar) {
-                // Preserve two decimal places
-                $jar->percentage = (float) round($percent, 2);
+        // Do updates and redistribution in a transaction
+        DB::transaction(function () use ($user, $percentages) {
+            // Load jars for user
+            $jars = Jar::where('user_id', $user->id)->orderBy('id')->get();
+
+            // Update percentages in-memory map
+            $jarMap = [];
+            foreach ($jars as $jar) {
+                if (array_key_exists($jar->id, $percentages)) {
+                    $jar->percentage = (float) round($percentages[$jar->id], 2);
+                }
+                // ensure percentage is numeric
+                $jarMap[$jar->id] = $jar;
+            }
+
+            // Persist updated percentages
+            foreach ($jarMap as $jar) {
                 $jar->save();
             }
-        }
 
-        return redirect()->back()->with('success', 'Jar percentages updated');
+            // Redistribute balances according to new percentages
+            $total = (float) Jar::where('user_id', $user->id)->sum('balance');
+
+            // If total is zero, just ensure balances are zero (no-op)
+            if ($total <= 0) {
+                foreach ($jarMap as $jar) {
+                    Jar::where('id', $jar->id)->update(['balance' => 0]);
+                }
+                return;
+            }
+
+            // Calculate target balances with cent precision (2 decimals)
+            $distributedTotal = 0.0;
+            $shares = [];
+            foreach ($jarMap as $jar) {
+                $pct = (float) $jar->percentage / 100.0;
+                $raw = $total * $pct;
+                // floor to cents
+                $share = floor($raw * 100) / 100.0;
+                $shares[$jar->id] = $share;
+                $distributedTotal += $share;
+            }
+
+            // Remainder due to rounding
+            $remainder = round($total - $distributedTotal, 2);
+            if ($remainder > 0) {
+                // assign remainder to jar with highest percentage (tie-breaker: lowest id)
+                $target = collect($jarMap)->sortByDesc('percentage')->first();
+                $shares[$target->id] += $remainder;
+            }
+
+            // Apply new balances
+            foreach ($shares as $jarId => $balance) {
+                Jar::where('id', $jarId)->update(['balance' => $balance]);
+            }
+        });
+
+        return redirect()->back()->with('success', 'Jar percentages updated and balances redistributed');
     }
 
     /**
@@ -105,14 +154,55 @@ class JarsController extends Controller
 
         $defaults = config('jars.defaults', []);
 
-        foreach ($defaults as $name => $percent) {
-            Jar::updateOrCreate(
-                ['user_id' => $user->id, 'name' => $name],
-                ['percentage' => $percent]
-            );
-        }
+        // Update percentages and redistribute balances according to defaults
+        DB::transaction(function () use ($user, $defaults) {
+            // Ensure jars exist and set default percentages
+            foreach ($defaults as $name => $percent) {
+                Jar::updateOrCreate(
+                    ['user_id' => $user->id, 'name' => $name],
+                    ['percentage' => (float) round($percent, 2)]
+                );
+            }
 
-        return redirect()->route('jarconfigs')->with('success', 'Jar percentages reset to defaults');
+            // Load jars for redistribution
+            $jars = Jar::where('user_id', $user->id)->orderBy('id')->get();
+
+            // Calculate total balance across jars
+            $total = (float) $jars->sum('balance');
+
+            if ($total <= 0) {
+                // set balances to zero (safe) and return
+                foreach ($jars as $jar) {
+                    Jar::where('id', $jar->id)->update(['balance' => 0]);
+                }
+                return;
+            }
+
+            // Compute target balances (cent precision)
+            $distributedTotal = 0.0;
+            $shares = [];
+            foreach ($jars as $jar) {
+                $pct = (float) $jar->percentage / 100.0;
+                $raw = $total * $pct;
+                $share = floor($raw * 100) / 100.0; // floor to cents
+                $shares[$jar->id] = $share;
+                $distributedTotal += $share;
+            }
+
+            // Assign remainder to highest percentage jar
+            $remainder = round($total - $distributedTotal, 2);
+            if ($remainder > 0) {
+                $target = $jars->sortByDesc('percentage')->first();
+                $shares[$target->id] += $remainder;
+            }
+
+            // Apply new balances
+            foreach ($shares as $jarId => $balance) {
+                Jar::where('id', $jarId)->update(['balance' => $balance]);
+            }
+        });
+
+        return redirect()->route('jarconfigs')->with('success', 'Jar percentages reset to defaults and balances redistributed');
     }
 }
 
