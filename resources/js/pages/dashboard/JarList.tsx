@@ -49,9 +49,6 @@ export default function JarList({ className }: {className:string}) {
     // - mobile: single column
     // - sm: 3 columns
     // - md and up: 3 columns x 2 rows
-    // Use single column for widths < 750px, otherwise 3 columns and 2 rows on md+.
-    // max-[749px]:!grid-cols-1 ensures the 640-749px range (where sm would normally apply)
-    // still shows a single column as requested.
     const containerClass = `${className ?? ''} grid grid-cols-1 sm:grid-cols-3 max-[770px]:!grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-4 items-stretch`;
 
     const {props} = usePage<Jars>();

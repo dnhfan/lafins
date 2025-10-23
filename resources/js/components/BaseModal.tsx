@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
@@ -26,6 +27,8 @@ interface BaseModalProps {
   onSuccess?: () => void;
   storeUrl: string;
   updateUrl: (id: number) => string;
+  // Optional renderer for extra content under a specific field.
+  fieldExtra?: (fieldName: string, value: string, data: Record<string, string>) => ReactNode;
 }
 
 // main funct
@@ -39,6 +42,7 @@ export default function BaseModal({
   onSuccess,
   storeUrl,
   updateUrl,
+  fieldExtra,
 }: BaseModalProps) {
   // Create initial form data from fields
   const initialFormData = fields.reduce((acc, field) => {
@@ -154,6 +158,9 @@ export default function BaseModal({
               {errors[field.name] && (
                 <div className="text-red-500 text-sm mt-1">{String(errors[field.name])}</div>
               )}
+
+              {/* optional extra renderer for a field (e.g. show jar balance under jar select) */}
+              {fieldExtra && fieldExtra(field.name, data[field.name], data)}
             </div>
           ))}
 

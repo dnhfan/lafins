@@ -57,6 +57,28 @@ export default function OutcomeModal({ type, isOpen, onClose, initialData = null
     },
   ];
 
+  // helper to format currency
+  function formatCurrency(amount: number | null | undefined) {
+    if (amount == null) return '-';
+    try {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(amount));
+    } catch (e) {
+      return String(amount);
+    }
+  }
+
+  // renderer to show extra content under a field
+  function renderFieldExtra(fieldName: string, value: string, data: Record<string, string>) {
+    if (fieldName !== 'jar_id') return null;
+    const selectedId = Number(value || data['jar_id'] || initialData?.jar_id || '');
+    const jar = jars.find((j) => Number(j.id) === selectedId) as Jar | undefined;
+    if (!jar) return null;
+
+    return (
+      <div className="mt-2 text-sm text-gray-600">Balance: <span className="font-medium">{formatCurrency(jar.balance)}</span></div>
+    );
+  }
+
   return (
     <BaseModal
       type={type}
@@ -68,6 +90,7 @@ export default function OutcomeModal({ type, isOpen, onClose, initialData = null
       onSuccess={onSuccess}
       storeUrl={OutcomeController.store.url()}
       updateUrl={(id) => OutcomeController.update.url(id)}
+      fieldExtra={renderFieldExtra}
     />
   );
 }
