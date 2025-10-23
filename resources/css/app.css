@@ -141,7 +141,7 @@
         @apply bg-background text-foreground;
     }
 }
-
+/* dashboard */
 .card-default {
   @apply relative w-full box-border h-auto overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-gray-700;
 }
@@ -150,6 +150,7 @@
     @apply w-12 h-12 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-700 dark:text-gray-300;
 }
 
+/* component */
 /* Search box: compact icon that expands input on hover or focus */
 .search-box {
     display: inline-flex;
@@ -468,10 +469,6 @@
     gap: 10px;
 }
 
-.fsbox-search {
-    /* keep search compact */
-}
-
 .fsbox-add {
     display: inline-flex;
 }
@@ -500,9 +497,5 @@
     .fsbox-right {
         width: 100%;
         justify-content: flex-start;
-    }
-
-    .fsbox-add {
-        /* keep add button aligned to the left of search on small screens */
     }
 }
