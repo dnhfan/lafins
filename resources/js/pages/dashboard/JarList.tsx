@@ -1,6 +1,4 @@
 import { usePage } from "@inertiajs/react";
-import { useRef } from 'react'
-import useResponsiveChartSize from '@/hooks/useResponsiveChartSize'
 import type { Jars, Jar } from '@/types';
 
 const iconByKey: Record<string, string> = {
@@ -12,8 +10,8 @@ const iconByKey: Record<string, string> = {
   GIVE: 'fa-solid fa-hand-holding-heart', 
 }
 
-// JarBox: hiển thị 1 hộp jar gồm icon, tên và số dư
-function JarBox({ name = 'Unknown Jar', balance = 0, icon, className = '' }: { name?: string; balance?: number; icon?: React.ReactNode; className?: string }) {
+// JarBox: hiển thị 1 hộp jar gồm icon, tên, phần trăm và số dư
+function JarBox({ name = 'Unknown Jar', balance = 0, percentage, icon, className = '' }: { name?: string; balance?: number; percentage?: number; icon?: React.ReactNode; className?: string }) {
     // Format số tiền theo chuẩn Việt Nam
     const formatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(balance) || 0)
 
@@ -24,37 +22,37 @@ function JarBox({ name = 'Unknown Jar', balance = 0, icon, className = '' }: { n
                 {icon}
             </div>
 
-            <div className="flex-1 text-left">
-                <div className="text-sm font-medium text-slate-700 dark:text-white whitespace-normal break-words">{name}</div>
-                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{formatted}</div>
-            </div>
+                        <div className="flex-1 text-left">
+                                <div className="flex items-baseline gap-3">
+                                    <div className="text-sm font-medium text-slate-700 dark:text-white whitespace-normal break-words">{name}</div>
+                                    {typeof percentage === 'number' && (
+                                        <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{Number(percentage).toFixed(2)}%</div>
+                                    )}
+                                </div>
+                                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{formatted}</div>
+                        </div>
         </div>
     )
 }
 
 export default function JarList({ className }: {className:string}) {
-    const wrapperRef = useRef<HTMLDivElement | null>(null)
-    // measuredWidth được dùng để quyết định layout responsive đặc biệt
-    const { measuredWidth } = useResponsiveChartSize(wrapperRef, { min: 220, max: 1600, scale: 1 })
-
-    // logic responsive:
-    // - medium (>=640) and <1000: show 3 columns x 2 rows (3 on top, 3 below)
-    // - >=1000: original 6 columns
-    const isThreeByTwo = typeof measuredWidth === 'number'  && measuredWidth < 1120
-
-    const containerClass = `${className ?? ''} grid ${isThreeByTwo ? 'grid-cols-3 grid-rows-2' : 'grid-cols-1 sm:grid-cols-3 md:grid-cols-6'} gap-4 items-stretch`
+    // Use a consistent layout:
+    // - mobile: single column
+    // - sm: 3 columns
+    // - md and up: 3 columns x 2 rows (always show two rows of three)
+    const containerClass = `${className ?? ''} grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 md:grid-rows-2 gap-4 items-stretch`;
 
     const {props} = usePage<Jars>();
     const jars = props?.jars ?? [];
 
     return (
-        <div ref={wrapperRef} className={containerClass}>
+        <div className={containerClass}>
             {Array.isArray(jars) && jars.map((j: Jar) => {
                 const iconClass = iconByKey[j.key as string] ?? 'fa-solid fa-circle-dot'
                 // Using <i> for FontAwesome class names present in project
                 const icon = <i className={`${iconClass} text-slate-700 dark:text-white`} aria-hidden />
                 return (
-                    <JarBox key={j.id} name={j.label ?? j.key} balance={j.balance} icon={icon} />
+                    <JarBox key={j.id} name={j.label ?? j.key} balance={j.balance} percentage={j.percentage} icon={icon} />
                 )
             })}
         </div>
