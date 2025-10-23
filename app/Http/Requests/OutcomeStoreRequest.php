@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Jar;
 
 class OutcomeStoreRequest extends FormRequest
 {
@@ -28,5 +29,28 @@ class OutcomeStoreRequest extends FormRequest
             'amount' => ['required', 'numeric', 'min:0'],
             'jar_id' => ['required', 'exists:jars,id'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $data = $this->validated();
+            if (isset($data['jar_id']) && isset($data['amount'])) {
+                $jar = Jar::where('id', $data['jar_id'])->first();
+                if (! $jar) {
+                    $validator->errors()->add('jar_id', 'Selected jar not found.');
+                    return;
+                }
+                // check ownership
+                if ($jar->user_id !== $this->user()->id) {
+                    $validator->errors()->add('jar_id', 'Selected jar does not belong to you.');
+                    return;
+                }
+                // check balance
+                if ((float) $jar->balance < (float) $data['amount']) {
+                    $validator->errors()->add('amount', 'Insufficient balance in selected jar.');
+                }
+            }
+        });
     }
 }

@@ -103,7 +103,7 @@ class Outcome extends Model
     // Format số tiền
     public function getFormattedAmountAttribute()
     {
-        return number_format($this->amount, 0, ',', '.') . ' VND';
+        return number_format((float) $this->amount, 0, ',', '.') . ' VND';
     }
     
     // Lấy tên danh mục tiếng Việt
@@ -115,7 +115,7 @@ class Outcome extends Model
     // Lấy chi tiêu hôm nay
     public static function today()
     {
-        return static::whereDate('date', today());
+        return static::where('date', today());
     }
     
     // Lấy chi tiêu tháng này
@@ -136,11 +136,6 @@ class Outcome extends Model
     protected static function boot()
     {
         parent::boot();
-        
-        static::created(function ($outcome) {
-            if ($outcome->jar_id && $outcome->jar) {
-                $outcome->jar->subtractMoney($outcome->amount);
-            }
-        });
+        // Balance adjustments are handled in the OutcomeController inside DB transactions.
     }
 }

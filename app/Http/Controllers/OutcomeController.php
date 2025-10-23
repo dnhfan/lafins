@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Outcome;
+use App\Models\Jar;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Concerns\PreservesFilters;
 use App\Http\Controllers\Concerns\BuildsFinancialQuery;
 use App\Http\Requests\OutcomeStoreRequest;
@@ -87,8 +89,36 @@ class OutcomeController extends Controller
         // 2. Add user_id to the data
         $validated['user_id'] = $request->user()->id;
 
-        // 3. Create the outcome
-        Outcome::create($validated);
+        // 3. Create the outcome and adjust jar balance inside a transaction
+        try {
+            DB::transaction(function () use ($validated, &$created) {
+                // If a jar is selected, ensure it belongs to user and has enough balance
+                if (!empty($validated['jar_id'])) {
+                    $jar = Jar::where('id', $validated['jar_id'])
+                        ->where('user_id', $validated['user_id'])
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (! $jar) {
+                        throw new \RuntimeException('Selected jar not found.');
+                    }
+
+                    $amount = (int) round($validated['amount']);
+                    // balance is decimal, compare as numeric
+                    if ((float) $jar->balance < $amount) {
+                        throw new \RuntimeException('Insufficient balance in selected jar.');
+                    }
+
+                    // Decrement jar balance atomically
+                    Jar::where('id', $jar->id)->decrement('balance', $amount);
+                }
+
+                $created = Outcome::create($validated);
+            });
+        } catch (\RuntimeException $e) {
+            $filters = $this->extractFiltersFromReferer($request) ?: ['range' => 'day', 'page' => 1];
+            return redirect()->route('outcomes', $filters)->with('error', $e->getMessage());
+        }
 
         // 4. Extract filters from referer for preserving state
         $filters = $this->extractFiltersFromReferer($request);
@@ -113,8 +143,41 @@ class OutcomeController extends Controller
         // 2. Get validated data from the OutcomeUpdateRequest
         $validated = $request->validated();
 
-        // 3. Update the outcome
-        $outcome->update($validated);
+        // 3. Update the outcome and adjust jar balances accordingly
+        try {
+            DB::transaction(function () use ($outcome, $validated) {
+                $userId = $outcome->user_id;
+                $oldJarId = $outcome->jar_id;
+                    $oldAmount = (int) round((float) $outcome->amount);
+
+                // 1) Refund old jar if present
+                if (!empty($oldJarId)) {
+                    Jar::where('id', $oldJarId)->lockForUpdate()->increment('balance', $oldAmount);
+                }
+
+                // 2) If new jar specified, deduct new amount from it
+                if (!empty($validated['jar_id'])) {
+                    $newJar = Jar::where('id', $validated['jar_id'])
+                        ->where('user_id', $userId)
+                        ->lockForUpdate()
+                        ->first();
+                    if (! $newJar) {
+                        throw new \RuntimeException('Selected jar not found.');
+                    }
+                    $newAmount = (int) round($validated['amount']);
+                    if ((float) $newJar->balance < $newAmount) {
+                        throw new \RuntimeException('Insufficient balance in selected jar.');
+                    }
+                    Jar::where('id', $newJar->id)->decrement('balance', $newAmount);
+                }
+
+                // 3) Finally update the outcome
+                $outcome->update($validated);
+            });
+        } catch (\RuntimeException $e) {
+            $filters = $this->extractFiltersFromReferer($request) ?: ['range' => 'day', 'page' => 1];
+            return redirect()->route('outcomes', $filters)->with('error', $e->getMessage());
+        }
 
         // 4. Extract filters from referer for preserving state
         $filters = $this->extractFiltersFromReferer($request);
@@ -133,8 +196,13 @@ class OutcomeController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // 2. Delete the outcome
-        $outcome->delete();
+        // 2. Refund jar (if any) then delete outcome within a transaction
+        DB::transaction(function () use ($outcome) {
+                if (!empty($outcome->jar_id)) {
+                    Jar::where('id', $outcome->jar_id)->lockForUpdate()->increment('balance', (int) round((float) $outcome->amount));
+                }
+            $outcome->delete();
+        });
 
         // 3. Extract filters from referer for preserving state
         $filters = $this->extractFiltersFromReferer($request);
