@@ -11,13 +11,22 @@ const iconByKey: Record<string, string> = {
 }
 
 // JarBox: hiển thị 1 hộp jar gồm icon, tên, phần trăm và số dư
-function JarBox({ name = 'Unknown Jar', balance = 0, percentage, icon, className = '' }: { name?: string; balance?: number; percentage?: number; icon?: React.ReactNode; className?: string }) {
+function JarBox({ name = 'Unknown Jar', balance = 0, percentage, icon, className = '', onClick }: { name?: string; balance?: number; percentage?: number; icon?: React.ReactNode; className?: string, onClick?: () => void }) {
     // Format số tiền theo chuẩn Việt Nam
     const formatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(balance) || 0)
 
+    // Tailwind classes to create a pleasant hover/press effect and keyboard focus ring
+    const interactiveClasses = 'cursor-pointer transform transition-transform duration-200 ease-out hover:scale-105 active:scale-100 hover:shadow-lg hover:ring-2 hover:ring-indigo-200 dark:hover:ring-indigo-500 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300'
 
     return (
-    <div className={`${className} h-full p-7 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm dark:shadow-none flex items-center gap-3 bg-white dark:bg-[#0a0a0a]`}> 
+    <div
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={(e) => { if (onClick && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onClick(); } }}
+      aria-label={typeof name === 'string' ? `${name} jar` : 'jar'}
+      className={`${className} ${interactiveClasses} h-full p-7 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm dark:shadow-none flex items-center gap-3 bg-white dark:bg-[#0a0a0a]`}
+    > 
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
                 {icon}
             </div>
