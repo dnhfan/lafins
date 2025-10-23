@@ -32,7 +32,7 @@ class JarsController extends Controller
                         'id' => $jar->id,
                         // Use short code for display (NEC, FFA, ...)
                         'key' => $jar->name,
-                        'label' => $jar->name,
+                        'label' => $jar->full_name ?? $jar->name,
                         'percentage' => (float) $jar->percentage,
                         'balance' => (float) $jar->balance,
                     ];
