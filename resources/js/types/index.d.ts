@@ -45,6 +45,7 @@ export interface User {
 export interface Jar {
   id: number;
   name: string; // Jar name (NEC, FFA, EDU, LTSS, PLAY, GIVE)
+  label: string;
   key: string;
   percentage: number;
   balance: number;

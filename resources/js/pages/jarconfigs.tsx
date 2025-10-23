@@ -4,7 +4,8 @@ import { Head } from "@inertiajs/react";
 import JarList from './jarconfigs/jar-list';
 import ConfigHeader from "./jarconfigs/jarconfig-head";
 import { usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import type { Jar } from '@/types';
 import JarsController from '@/actions/App/Http/Controllers/JarsController';
 import { Inertia } from '@inertiajs/inertia';
 import DeleteAllDataBox from './jarconfigs/del-data';
@@ -18,26 +19,30 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Jarsconfig() {
-    const { props } = usePage<{ jars?: any[] } & Record<string, unknown>>();
-    const serverJars = props?.jars ?? [];
+    const { props } = usePage<{ jars?: Jar[] } & Record<string, unknown>>();
+    const serverJars = useMemo(() => props?.jars ?? [], [props?.jars]);
 
     // local editable state for percentages: { id: percent }
     const [percentages, setPercentages] = useState<Record<string | number, number>>(() => {
         const map: Record<string | number, number> = {};
-        serverJars.forEach((j: any) => { map[j.id] = Number(j.percentage ?? 0); });
+        (serverJars as Jar[]).forEach((j) => { map[j.id] = Number(j.percentage ?? 0); });
         return map;
     });
 
     // reflect server changes if props change
     useEffect(() => {
         const map: Record<string | number, number> = {};
-        serverJars.forEach((j: any) => { map[j.id] = Number(j.percentage ?? 0); });
+        (serverJars as Jar[]).forEach((j) => { map[j.id] = Number(j.percentage ?? 0); });
         setPercentages(map);
     }, [serverJars]);
 
     function handlePercentChange(id: number | string, percent: number) {
         setPercentages((s) => ({ ...s, [id]: percent }));
     }
+
+    // Local alert state used to drive the shared alert dialog
+    const [alert, setAlert] = useState<{ message: string; variant: 'success' | 'error' } | null>(null);
+    function clearAlert() { setAlert(null); }
 
     async function handleSave() {
         // call bulkUpdate
@@ -53,14 +58,16 @@ export default function Jarsconfig() {
             setAlert({ message: `Total percentage must equal 100%. Current total is ${total.toFixed(2)}%.`, variant: 'error' });
             return;
         }
+        const form = new FormData();
+        Object.entries(payload).forEach(([k, v]) => form.append(`percentages[${k}]`, String(v)));
 
         Inertia.post(
             JarsController.bulkUpdate.url(),
-            { percentages: payload } as any,
+            form,
             {
                 preserveState: true,
                 onSuccess: () => setAlert({ message: 'Jar percentages saved successfully.', variant: 'success' }),
-                onError: (err) => setAlert({ message: 'Failed to save jar percentages.', variant: 'error' }),
+                onError: () => setAlert({ message: 'Failed to save jar percentages.', variant: 'error' }),
             }
         );
     }
@@ -79,6 +86,7 @@ export default function Jarsconfig() {
                 
                 <JarList className="w-full" onPercentChange={handlePercentChange} />
                 <DeleteAllDataBox />
+                <SuccessDialog message={alert?.message ?? undefined} variant={alert?.variant} onClose={clearAlert} suppressFlash={!!alert} />
             </main>
         </AppLayout>
         
