@@ -44,26 +44,6 @@ class JarsController extends Controller
     }
 
     /**
-     * Update a single jar percentage
-     */
-    public function update(Request $request, Jar $jar): RedirectResponse
-    {
-        if ($jar->user_id !== $request->user()->id) {
-            abort(403);
-        }
-
-        $data = $request->validate([
-            'percentage' => ['required', 'numeric', 'min:0', 'max:100'],
-        ]);
-
-    // Preserve decimal precision to match DB (decimal(5,2))
-    $jar->percentage = (float) round($data['percentage'], 2);
-        $jar->save();
-
-        return redirect()->back()->with('success', 'Jar updated');
-    }
-
-    /**
      * Bulk update percentages for multiple jars
      * Expects payload: { percentages: { <jarId>: <percent>, ... } }
      */
