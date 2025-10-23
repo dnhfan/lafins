@@ -42,7 +42,7 @@ export default function OutcomeModal({ type, isOpen, onClose, initialData = null
       label: 'Jar',
       type: 'select',
       required: true,
-      options: jars.map((jar) => ({ label: jar.name || jar.id.toString(), value: jar.id })),
+  options: jars.map((jar) => ({ label: jar.label || jar.key || jar.id.toString(), value: jar.id })),
     },
     {
       name: 'description',
