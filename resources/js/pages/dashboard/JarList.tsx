@@ -31,15 +31,15 @@ function JarBox({ name = 'Unknown Jar', balance = 0, percentage, icon, className
                 {icon}
             </div>
 
-                        <div className="flex-1 text-left">
-                                <div className="flex items-baseline gap-3">
-                                    <div className="text-sm font-medium text-slate-700 dark:text-white whitespace-normal break-words">{name}</div>
-                                    {typeof percentage === 'number' && (
-                                        <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{Number(percentage).toFixed(2)}%</div>
-                                    )}
-                                </div>
-                                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{formatted}</div>
+                <div className="flex-1 text-left">
+                        <div className="flex items-baseline gap-3">
+                            <div className="text-sm font-medium text-slate-700 dark:text-white whitespace-normal break-words">{name}</div>
+                            {typeof percentage === 'number' && (
+                                <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{Number(percentage).toFixed(2)}%</div>
+                            )}
                         </div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{formatted}</div>
+                </div>
         </div>
     )
 }
@@ -48,8 +48,11 @@ export default function JarList({ className }: {className:string}) {
     // Use a consistent layout:
     // - mobile: single column
     // - sm: 3 columns
-    // - md and up: 3 columns x 2 rows (always show two rows of three)
-    const containerClass = `${className ?? ''} grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 md:grid-rows-2 gap-4 items-stretch`;
+    // - md and up: 3 columns x 2 rows
+    // Use single column for widths < 750px, otherwise 3 columns and 2 rows on md+.
+    // max-[749px]:!grid-cols-1 ensures the 640-749px range (where sm would normally apply)
+    // still shows a single column as requested.
+    const containerClass = `${className ?? ''} grid grid-cols-1 sm:grid-cols-3 max-[770px]:!grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-4 items-stretch`;
 
     const {props} = usePage<Jars>();
     const jars = props?.jars ?? [];
