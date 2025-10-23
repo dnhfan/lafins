@@ -4,7 +4,7 @@ import { Head, usePage } from "@inertiajs/react";
 import FSbox from "../components/FSbox";
 import AddIncomeModal from "./incomes/addModal";
 import IncomesTable from "./incomes/IncomesTable";
-import SuccessDialog from "@/components/success-dialog";
+import SuccessDialog from "@/components/alert-dialog";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
