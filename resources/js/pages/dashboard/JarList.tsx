@@ -1,5 +1,7 @@
 import { usePage } from "@inertiajs/react";
+import { useState } from 'react';
 import type { Jars, Jar } from '@/types';
+import OutcomeModal from '@/components/OutcomeModal';
 
 const iconByKey: Record<string, string> = {
   NEC: 'fa-solid fa-cart-shopping', 
@@ -54,16 +56,40 @@ export default function JarList({ className }: {className:string}) {
     const {props} = usePage<Jars>();
     const jars = props?.jars ?? [];
 
+    // modal state: open when user clicks a jar to add an outcome
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedJarId, setSelectedJarId] = useState<number | string | null>(null);
+
+    function openAddOutcomeModal(jarId: number | string) {
+        setSelectedJarId(jarId);
+        setIsModalOpen(true);
+    }
+
+    function closeModal() {
+        setIsModalOpen(false);
+        setSelectedJarId(null);
+    }
+
     return (
+        <>
         <div className={containerClass}>
             {Array.isArray(jars) && jars.map((j: Jar) => {
                 const iconClass = iconByKey[j.key as string] ?? 'fa-solid fa-circle-dot'
                 // Using <i> for FontAwesome class names present in project
                 const icon = <i className={`${iconClass} text-slate-700 dark:text-white`} aria-hidden />
                 return (
-                    <JarBox key={j.id} name={j.label ?? j.key} balance={j.balance} percentage={j.percentage} icon={icon} />
+                    <JarBox key={j.id} name={j.label ?? j.key} balance={j.balance} percentage={j.percentage} icon={icon} onClick={() => openAddOutcomeModal(j.id)} />
                 )
             })}
         </div>
+
+        <OutcomeModal
+            type="add"
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            initialData={selectedJarId ? { jar_id: selectedJarId } : undefined}
+            onSuccess={closeModal}
+        />
+        </>
     )
 }
