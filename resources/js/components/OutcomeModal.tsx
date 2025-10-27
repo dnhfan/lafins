@@ -63,6 +63,7 @@ export default function OutcomeModal({ type, isOpen, onClose, initialData = null
     try {
       return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(amount));
     } catch (e) {
+      console.error("something wrong when format the amount: ", e);
       return String(amount);
     }
   }
