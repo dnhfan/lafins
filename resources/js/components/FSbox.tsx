@@ -9,7 +9,7 @@ import { router, usePage } from "@inertiajs/react";
 type FSboxProps = {
     endpoint: string;
     addTitle: string;
-    AddModalComponent: React.ComponentType<{ isOpen: boolean; onClose: () => void }>;
+    AddModalComponent: React.ComponentType<{ isOpen: boolean; onClose: () => void; onSuccess?: () => void }>;
     sortFields: Array<{ label: string; value: string }>;
     defaultSortBy: string;
     defaultSortDir?: 'asc' | 'desc';
@@ -56,7 +56,13 @@ export default function FSbox({
                 <div className="fsbox-left">
                     <div className="fsbox-search"><SearchBox /></div>
                     <div className="fsbox-add"><AddBtn title={addTitle} onClick={() => setOpen(true)} /></div>
-                    <AddModalComponent isOpen={open} onClose={() => setOpen(false)} />
+                    <AddModalComponent
+                        isOpen={open}
+                        onClose={() => setOpen(false)}
+                        onSuccess={() => {
+                            setOpen(false);
+                        }}
+                    />
                 </div>
 
                 <div className="fsbox-right">
