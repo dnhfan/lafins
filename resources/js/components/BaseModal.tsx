@@ -54,13 +54,23 @@ export default function BaseModal({
 
   // Update form when modal is open
   useEffect(() => {
+    if (!isOpen) return;
+
     if (initialData) {
       fields.forEach((field) => {
         const value = initialData[field.name];
         setData(field.name as keyof typeof data, value != null ? String(value) : '');
       });
     } else if (type === 'add') {
+      // reset to initial then set any date fields to today
       reset();
+
+      const today = new Date().toISOString().split('T')[0];
+      fields.forEach((field) => {
+        if (field.type === 'date') {
+          setData(field.name as keyof typeof data, today);
+        }
+      });
     }
   }, [initialData, type, isOpen, fields, reset, setData]);
 
