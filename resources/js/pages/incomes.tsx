@@ -1,20 +1,28 @@
-import AppLayout from "@/layouts/app-layout";
-import { BreadcrumbItem } from "@/types";
-import { Head, usePage } from "@inertiajs/react";
-import FSbox from "../components/FSbox";
-import AddIncomeModal from "./incomes/addModal";
-import IncomesTable from "./incomes/IncomesTable";
-import SuccessDialog from "@/components/alert-dialog";
+import SuccessDialog from '@/components/alert-dialog';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+import FSbox from '../components/FSbox';
+import AddIncomeModal from './incomes/addModal';
+import IncomesTable from './incomes/IncomesTable';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: "Income",
-        href: "/incomes"
+        title: 'Income',
+        href: '/incomes',
     },
 ];
 
 export default function Incomes() {
-    const { props } = usePage<{ flash?: { success?: string | null; error?: string | null; status?: string | null } } & Record<string, unknown>>();
+    const { props } = usePage<
+        {
+            flash?: {
+                success?: string | null;
+                error?: string | null;
+                status?: string | null;
+            };
+        } & Record<string, unknown>
+    >();
     const successMessage = props?.flash?.success ?? undefined;
 
     return (
@@ -28,7 +36,7 @@ export default function Incomes() {
                         AddModalComponent={AddIncomeModal}
                         sortFields={[
                             { label: 'Date', value: 'date' },
-                            { label: 'Amount', value: 'amount' }
+                            { label: 'Amount', value: 'amount' },
                         ]}
                         defaultSortBy="date"
                         defaultSortDir="desc"
@@ -36,8 +44,8 @@ export default function Incomes() {
                     <IncomesTable />
                 </main>
                 <SuccessDialog message={successMessage ?? undefined} />
-                
-            </AppLayout> 
+            </AppLayout>
         </>
-    )
+    );
 }
+
