@@ -14,6 +14,8 @@ export default function Welcome() {
                     rel="stylesheet"
                 />
             </Head>
+
+            {/* this is header */}
             <div className="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]">
                 <header className="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">
                     <nav className="flex items-center justify-end gap-4">
@@ -42,13 +44,18 @@ export default function Welcome() {
                         )}
                     </nav>
                 </header>
+
+                {/* this is main content */}
                 <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
                     <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-4xl lg:flex-row">
                         <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
-                            <h1 className="mb-1 font-medium">Chào mừng đến với Lafins</h1>
+                            <h1 className="mb-1 font-medium">
+                                Chào mừng đến với Lafins
+                            </h1>
                             <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                                Lafins — Ứng dụng quản lý tài chính cá nhân giúp bạn quản lý thu chi,
-                                phân bổ ngân sách và theo dõi mục tiêu tài chính một cách trực quan.
+                                Lafins — Ứng dụng quản lý tài chính cá nhân giúp
+                                bạn quản lý thu chi, phân bổ ngân sách và theo
+                                dõi mục tiêu tài chính một cách trực quan.
                             </p>
                             <ul className="mb-4 flex flex-col lg:mb-6">
                                 <li className="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
@@ -58,7 +65,8 @@ export default function Welcome() {
                                         </span>
                                     </span>
                                     <span>
-                                        Quản lý thu chi: Ghi chép chi tiết các khoản thu và chi hàng ngày.
+                                        Quản lý thu chi: Ghi chép chi tiết các
+                                        khoản thu và chi hàng ngày.
                                     </span>
                                 </li>
                                 <li className="relative flex items-center gap-4 py-2 before:absolute before:top-0 before:bottom-1/2 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
@@ -68,7 +76,8 @@ export default function Welcome() {
                                         </span>
                                     </span>
                                     <span>
-                                        Phân chia quỹ (Jars): Tạo và phân bổ ngân sách cho các mục tiêu khác nhau.
+                                        Phân chia quỹ (Jars): Tạo và phân bổ
+                                        ngân sách cho các mục tiêu khác nhau.
                                     </span>
                                 </li>
                                 <li className="relative flex items-center gap-4 py-2 before:absolute before:top-0 before:bottom-1/2 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
@@ -78,7 +87,8 @@ export default function Welcome() {
                                         </span>
                                     </span>
                                     <span>
-                                        Báo cáo & biểu đồ: Theo dõi xu hướng chi tiêu và tiến độ mục tiêu.
+                                        Báo cáo & biểu đồ: Theo dõi xu hướng chi
+                                        tiêu và tiến độ mục tiêu.
                                     </span>
                                 </li>
                             </ul>
@@ -94,14 +104,25 @@ export default function Welcome() {
                             </ul>
                         </div>
                         <div className="relative -mb-px aspect-[335/376] w-full shrink-0 overflow-hidden rounded-t-lg bg-[#fff2f2] lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-[438px] lg:rounded-t-none lg:rounded-r-lg dark:bg-[#1D0002]">
-                            <div className="flex items-center justify-center w-full h-full p-6 lg:p-8">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1578" preserveAspectRatio="xMidYMid meet" className="max-h-[320px] lg:max-h-[560px] w-auto">
-                                <metadata>
-                                Created by potrace 1.10, written by Peter Selinger 2001-2011
-                                </metadata>
-                                <g transform="translate(0.000000,1578.000000) scale(0.100000,-0.100000)"
-                                fill="#000000" stroke="none">
-                                <path d="M4225 11189 c-93 -4 -195 -12 -225 -18 -30 -6 -86 -15 -125 -22 -394
+                            <div className="flex h-full w-full items-center justify-center p-6 lg:p-8">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 900 1578"
+                                    preserveAspectRatio="xMidYMid meet"
+                                    className="max-h-[320px] w-auto lg:max-h-[560px]"
+                                >
+                                    <metadata>
+                                        Created by potrace 1.10, written by
+                                        Peter Selinger 2001-2011
+                                    </metadata>
+                                    <g
+                                        transform="translate(0.000000,1578.000000) scale(0.100000,-0.100000)"
+                                        fill="#000000"
+                                        stroke="none"
+                                        className="fill-[#000000] dark:fill-[#EDEDEC]"
+                                    >
+                                        <path
+                                            d="M4225 11189 c-93 -4 -195 -12 -225 -18 -30 -6 -86 -15 -125 -22 -394
                                 -64 -819 -237 -1220 -497 -373 -242 -770 -659 -1017 -1067 -170 -282 -334
                                 -650 -403 -905 -10 -36 -23 -85 -30 -110 -39 -138 -85 -419 -106 -655 -16
                                 -173 -23 -598 -11 -705 34 -300 38 -331 71 -485 35 -162 59 -256 76 -305 7
@@ -138,8 +159,10 @@ export default function Welcome() {
                                 -163 309 -283 647 -341 958 -9 47 -20 105 -25 130 -27 135 -35 274 -35 595 0
                                 322 8 462 35 595 5 25 17 88 26 140 9 52 28 136 41 185 14 50 28 106 33 125
                                 32 137 148 427 256 640 199 393 577 831 944 1092 372 266 771 426 1230 493
-                                160 23 403 30 580 15z"/>
-                                <path d="M4135 10670 c-195 -17 -460 -77 -615 -138 -14 -5 -45 -18 -70 -27
+                                160 23 403 30 580 15z"
+                                        />
+                                        <path
+                                            d="M4135 10670 c-195 -17 -460 -77 -615 -138 -14 -5 -45 -18 -70 -27
                                 -156 -62 -337 -154 -475 -243 -245 -158 -523 -421 -726 -687 -345 -451 -587
                                 -1073 -646 -1660 -12 -122 -10 -636 4 -760 12 -119 36 -269 52 -325 5 -19 17
                                 -69 26 -110 51 -220 146 -484 254 -700 70 -141 87 -171 177 -315 21 -33 83
@@ -165,54 +188,70 @@ export default function Welcome() {
                                 c-129 78 -246 148 -258 155 -12 7 -34 21 -49 30 -15 9 -114 70 -220 135 -106
                                 65 -238 147 -293 183 -55 35 -109 68 -120 74 -11 5 -88 54 -172 107 -170 110
                                 -232 149 -283 178 -88 51 -122 78 -131 103 -11 28 -3 2307 10 2828 6 246 7
-                                254 29 276 12 12 210 136 440 275 469 283 451 276 550 222z"/>
-                                <path d="M3080 9459 c-63 -39 -124 -75 -135 -80 -11 -5 -33 -18 -50 -29 -16
+                                254 29 276 12 12 210 136 440 275 469 283 451 276 550 222z"
+                                        />
+                                        <path
+                                            d="M3080 9459 c-63 -39 -124 -75 -135 -80 -11 -5 -33 -18 -50 -29 -16
                                 -11 -39 -24 -50 -30 -11 -5 -27 -15 -35 -20 -8 -6 -76 -45 -150 -88 -74 -44
                                 -136 -86 -138 -94 -2 -11 27 -33 90 -69 51 -30 102 -59 113 -66 11 -7 29 -16
                                 40 -22 11 -5 37 -21 58 -35 21 -14 40 -26 42 -26 2 0 50 -28 107 -61 57 -34
                                 135 -79 175 -101 l72 -39 213 129 c117 71 268 162 335 202 67 40 127 78 134
                                 86 8 10 -1 21 -45 49 -30 19 -57 35 -60 35 -2 0 -37 19 -78 43 -40 24 -80 46
                                 -88 50 -8 4 -28 16 -45 27 -16 10 -41 25 -55 33 -14 8 -90 51 -170 95 -80 45
-                                -149 82 -155 82 -5 -1 -62 -32 -125 -71z"/>
-                                <path d="M2446 8918 c-3 -7 -3 -630 -3 -1384 2 -1311 3 -1373 20 -1392 10 -11
+                                -149 82 -155 82 -5 -1 -62 -32 -125 -71z"
+                                        />
+                                        <path
+                                            d="M2446 8918 c-3 -7 -3 -630 -3 -1384 2 -1311 3 -1373 20 -1392 10 -11
                                 87 -62 170 -112 84 -51 179 -109 212 -130 33 -20 109 -66 168 -101 139 -83
                                 135 -80 182 -109 23 -14 50 -30 60 -37 131 -80 711 -429 717 -431 4 -2 7 162
                                 6 364 l-3 367 -45 32 c-42 29 -293 180 -630 378 -80 46 -153 93 -162 103 -15
                                 17 -17 107 -23 1039 -6 926 -8 1022 -23 1038 -9 10 -145 95 -302 189 -157 94
-                                -292 177 -301 184 -20 17 -38 18 -43 2z"/>
-                                <path d="M3910 8915 c-7 -8 -16 -15 -20 -15 -7 0 -114 -63 -240 -140 -8 -6
+                                -292 177 -301 184 -20 17 -38 18 -43 2z"
+                                        />
+                                        <path
+                                            d="M3910 8915 c-7 -8 -16 -15 -20 -15 -7 0 -114 -63 -240 -140 -8 -6
                                 -89 -53 -180 -106 -91 -54 -168 -102 -172 -108 -11 -16 -9 -1868 1 -1885 7
                                 -12 27 -4 103 39 51 29 112 64 135 77 24 13 109 63 190 111 82 48 165 96 186
-                                107 22 11 44 31 50 45 9 19 11 266 9 958 l-2 932 -24 0 c-13 0 -29 -7 -36 -15z"/>
-                                <path d="M5697 8814 c-21 -14 -109 -64 -195 -111 -86 -48 -184 -103 -217 -123
+                                107 22 11 44 31 50 45 9 19 11 266 9 958 l-2 932 -24 0 c-13 0 -29 -7 -36 -15z"
+                                        />
+                                        <path
+                                            d="M5697 8814 c-21 -14 -109 -64 -195 -111 -86 -48 -184 -103 -217 -123
                                 -33 -20 -81 -46 -107 -59 -30 -14 -45 -27 -42 -36 3 -7 80 -57 172 -111 195
                                 -114 420 -252 443 -271 30 -25 70 -14 171 47 54 33 101 60 103 60 1 0 59 33
                                 127 73 67 41 150 89 183 107 64 35 95 58 95 71 0 7 -333 208 -480 291 -180
-                                101 -190 103 -253 62z"/>
-                                <path d="M5062 8298 c-14 -14 -18 -714 -4 -735 6 -10 157 -103 166 -103 3 0
+                                101 -190 103 -253 62z"
+                                        />
+                                        <path
+                                            d="M5062 8298 c-14 -14 -18 -714 -4 -735 6 -10 157 -103 166 -103 3 0
                                 50 -27 106 -60 56 -33 103 -60 105 -60 2 0 49 -27 105 -60 56 -33 104 -60 107
                                 -60 3 0 16 -9 30 -20 14 -11 30 -17 36 -13 7 4 8 120 4 361 -7 390 -5 384 -70
                                 422 -14 8 -113 67 -219 132 -106 64 -211 126 -233 138 -22 12 -58 33 -81 46
-                                -31 18 -43 21 -52 12z"/>
-                                <path d="M6465 8271 c-9 -8 -191 -115 -312 -182 -153 -85 -246 -145 -260 -165
+                                -31 18 -43 21 -52 12z"
+                                        />
+                                        <path
+                                            d="M6465 8271 c-9 -8 -191 -115 -312 -182 -153 -85 -246 -145 -260 -165
                                 -14 -21 -15 -66 -8 -375 6 -273 10 -352 20 -356 8 -2 58 22 112 54 54 33 105
                                 62 113 66 8 4 27 15 42 25 15 9 86 51 158 92 71 41 140 83 152 92 l23 17 0
-                                368 c0 321 -2 368 -15 371 -9 1 -20 -2 -25 -7z"/>
-                                <path d="M4854 7336 c-49 -29 -110 -64 -135 -78 -24 -14 -120 -69 -214 -123
+                                368 c0 321 -2 368 -15 371 -9 1 -20 -2 -25 -7z"
+                                        />
+                                        <path
+                                            d="M4854 7336 c-49 -29 -110 -64 -135 -78 -24 -14 -120 -69 -214 -123
                                 -93 -54 -213 -123 -265 -153 -52 -30 -147 -85 -210 -122 -63 -37 -223 -129
                                 -355 -205 -132 -75 -243 -142 -247 -148 -12 -20 -41 -2 457 -293 93 -54 177
                                 -102 186 -106 25 -10 76 19 727 411 326 196 600 361 610 366 194 112 214 128
                                 191 149 -13 12 -317 187 -449 259 -30 16 -59 33 -65 37 -31 22 -108 60 -123
-                                60 -9 0 -58 -24 -108 -54z"/>
-                                <path d="M5650 6837 c-19 -13 -147 -91 -283 -173 -136 -82 -260 -157 -275
+                                60 -9 0 -58 -24 -108 -54z"
+                                        />
+                                        <path
+                                            d="M5650 6837 c-19 -13 -147 -91 -283 -173 -136 -82 -260 -157 -275
                                 -166 -15 -10 -36 -22 -47 -28 -11 -6 -32 -18 -47 -28 -22 -14 -189 -115 -648
                                 -391 -19 -11 -42 -24 -50 -28 -8 -3 -39 -21 -67 -40 l-53 -33 1 -232 c1 -128
                                 4 -296 8 -373 l6 -140 24 3 c13 2 43 16 65 30 54 35 77 49 101 62 11 6 32 18
                                 47 28 42 26 370 224 398 240 14 7 37 21 52 30 20 13 616 374 783 475 56 34 54
-                                21 55 420 0 344 -1 367 -18 367 -9 0 -33 -11 -52 -23z"/>
-                                </g>
+                                21 55 420 0 344 -1 367 -18 367 -9 0 -33 -11 -52 -23z"
+                                        />
+                                    </g>
                                 </svg>
-
                             </div>
                             <div className="absolute inset-0 rounded-t-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-t-none lg:rounded-r-lg dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]" />
                         </div>
