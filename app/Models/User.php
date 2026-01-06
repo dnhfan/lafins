@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -29,7 +30,6 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    
 
     /**
      * The attributes that should be hidden for serialization.
@@ -54,17 +54,16 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-     /**
+    /**
      * Relationships
      */
-    
     // 1. User có nhiều thu nhập (incomes)
     public function incomes()
     {
         return $this->hasMany(Income::class);
     }
 
-    // 2. User có nhiều chi tiêu (outcomes)  
+    // 2. User có nhiều chi tiêu (outcomes)
     public function outcomes()
     {
         return $this->hasMany(Outcome::class);
@@ -79,19 +78,18 @@ class User extends Authenticatable
     /**
      * Helper methods
      */
-    
     // Lấy tổng thu nhập
     public function getTotalIncomeAttribute()
     {
         return $this->incomes()->sum('amount');
     }
-    
+
     // Lấy tổng chi tiêu
     public function getTotalOutcomeAttribute()
     {
         return $this->outcomes()->sum('amount');
     }
-    
+
     // Lấy số dư tổng trong tất cả các hũ
     public function getTotalJarBalanceAttribute()
     {
