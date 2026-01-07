@@ -37,7 +37,7 @@ class OutcomeController extends Controller
         // default route
         if (!$request->filled('range') && !$request->filled('start') && !$request->filled('end') && !$request->filled('page')) {
             /* return redirect()->route('outcomes', ['range' => 'day', 'page' => 1]); */
-            $request->merge(['range' 'day']);
+            $request->merge(['range' => 'day']);
         }
 
         // 3-6. Apply common filters (range, date, search, sort) via trait
@@ -162,7 +162,7 @@ class OutcomeController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'You do not have permission to do this!',
-            ],403);
+            ], 403);
         }
 
         // 2. Get validated data from the OutcomeUpdateRequest
@@ -210,7 +210,7 @@ class OutcomeController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error when update outcomes: ' . $e->getMessage()
-            ],400);
+            ], 400);
         }
 
         /* // 4. Extract filters from referer for preserving state */
@@ -230,8 +230,8 @@ class OutcomeController extends Controller
             /* abort(403, 'Unauthorized action.'); */
             return response()->json([
                 'status' => 'error',
-                'message'=> 'You do not have permission to do this!',
-            ],403);
+                'message' => 'You do not have permission to do this!',
+            ], 403);
         }
 
         // 2. Refund jar (if any) then delete outcome within a transaction
