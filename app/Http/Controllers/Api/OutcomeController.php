@@ -11,7 +11,6 @@ use App\Models\Jar;
 use App\Models\Outcome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
 
 class OutcomeController extends Controller
 {
@@ -205,7 +204,6 @@ class OutcomeController extends Controller
                 'message' => 'Updated outcomes'
             ]);
         } catch (\RuntimeException $e) {
-            $filters = $this->extractFiltersFromReferer($request) ?: ['range' => 'day', 'page' => 1];
             /* return redirect()->route('outcomes', $filters)->with('error', $e->getMessage()); */
             return response()->json([
                 'status' => 'error',
@@ -243,7 +241,6 @@ class OutcomeController extends Controller
         });
 
         // 3. Extract filters from referer for preserving state
-        $filters = $this->extractFiltersFromReferer($request);
 
         // 4. Redirect back with preserved filters
         /* return redirect()->route('outcomes', $filters)->with('success', 'Deleted outcome!'); */
