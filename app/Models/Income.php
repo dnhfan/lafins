@@ -5,6 +5,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property numeric $amount
+ * @property string|null $source
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon $date
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income betweenDates($startDate, $endDate)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income whereDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income whereSource($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Income whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Income extends Model
 {
     //
