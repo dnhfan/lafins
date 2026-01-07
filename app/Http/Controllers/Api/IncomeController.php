@@ -268,4 +268,46 @@ class IncomeController extends Controller
         /* } */
         /* return redirect()->route('incomes', $filters)->with('success', 'Deleted income'); */
     }
+
+    public function show(Income $income)
+    {
+        // 1. Authorize
+        if ($income->user_id != auth()->id()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You do not have permission to do this!',
+            ], 403);
+        }
+
+        // 2. load relationship 'splits' and jar infor
+        $income->load(['splits.jar:id,name']);
+
+        // 3. transform data for frontend
+        $details = [
+            'id' => $income->id,
+            'date' => $income->date,
+            'source' => $income->source,
+            'description' => $income->description,
+            'amounts' => $income->amount,
+            'formatted_amount' => number_format(
+                $income->amount,
+                0,
+                ',',
+                '.',
+            ) . ' ₫',
+            'splits' => $income->splits->map(function ($splits) {
+                return [
+                    'jar_id' => $splits->jar_id,
+                    'jar_name' => $splits->jar->name ?? 'N/A',
+                    'amounts' => (float) $splits->amount,
+                ];
+            }),
+            'created_at' => $income->created_at->format('Y-m-d H:i:s'),
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $details,
+        ]);
+    }
 }
