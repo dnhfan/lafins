@@ -25,22 +25,21 @@ class OutcomeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(request $request)
     {
         // 1. take user from rq
         $user = $request->user();
 
         // 2. base query
-        $query = Outcome::where('user_id', $user->id);
+        $query = outcome::where('user_id', $user->id);
 
         // default route
         if (!$request->filled('range') && !$request->filled('start') && !$request->filled('end') && !$request->filled('page')) {
-            /* return redirect()->route('outcomes', ['range' => 'day', 'page' => 1]); */
             $request->merge(['range' => 'day']);
         }
 
-        // 3-6. Apply common filters (range, date, search, sort) via trait
-        $query = $this->applyFinancialFilters(
+        // 3-6. apply common filters (range, date, search, sort) via trait
+        $query = $this->applyfinancialfilters(
             $query,
             $request,
             ['category', 'description'],  // searchable columns for outcomes
@@ -49,32 +48,36 @@ class OutcomeController extends Controller
         );
 
         // 7. pagination
-        $perPage = (int) $request->input('per_page', 15);
-        $outcomes = $query->with('jar')->paginate($perPage)->withQueryString();
+        $perpage = (int) $request->input('per_page', 15);
+        $outcomes = $query->with('jar:id,name')->paginate($perpage)->withquerystring();
 
-        // 8. Add jar_label to each outcome BEFORE transformation
-        $outcomes->getCollection()->transform(function ($outcome) {
-            // Check if jar relationship exists and is loaded
-            if ($outcome->jar_id && $outcome->jar) {
-                // Use 'name' field from jar, not 'label'
-                $outcome->jar_label = $outcome->jar->name ?? 'None';
-            } else {
-                $outcome->jar_label = 'None';
-            }
-            return $outcome;
+        // 8. add jar_label to each outcome before transformation
+        $outcomes->getcollection()->transform(function ($outcomes) {
+            return [
+                'id' => $outcomes->id,
+                'date' => $outcomes->date,
+                'category' => $outcomes->category,
+                'description' => $outcomes->description,
+                'amount' => $outcomes->amount,
+                'formatted_amount' => number_format(
+                    $outcomes->amount,
+                    0,
+                    ',',
+                    '.',
+                ) . ' ₫',
+                'jar_id' => $outcomes->jar_id,
+                'jar_label' => $outcomes->jar->name ?? 'none',
+            ];
         });
 
-        // 9. transform collection -> Send only needed fields + formatted_amount + jar info
-        $this->transformFinancialCollection($outcomes, ['id', 'date', 'category', 'description', 'amount', 'jar_id', 'jar_label']);
+        // 10. get user's jars for the dropdown in outcomemodal
+        $jars = $user->jars()->get(['id', 'name']);
 
-        // 10. Get user's jars for the dropdown in OutcomeModal
-        $jars = $user->jars;
-
-        // 11. Return Inertia page with props outcomes(paginator) + filters + jars
-        /* return Inertia::render('outcomes', [ */
+        // 11. return inertia page with props outcomes(paginator) + filters + jars
+        /* return inertia::render('outcomes', [ */
         /* 'outcomes' => $outcomes, */
         /* 'jars' => $jars, */
-        /* 'filters' => $this->canonicalizeFilters( */
+        /* 'filters' => $this->canonicalizefilters( */
         /* $request->only(['range', 'start', 'end', 'search', 'sort_by', 'sort_dir', 'page', 'per_page']) */
         /* ), */
         /* ]); */
@@ -82,7 +85,7 @@ class OutcomeController extends Controller
         return response()->json([
             'outcomes' => $outcomes,
             'jars' => $jars,
-            'filters' => $this->canonicalizeFilters(
+            'filters' => $this->canonicalizefilters(
                 $request->only(['range', 'start', 'end', 'search', 'sort_by', 'sort_dir', 'page', 'per_page'])
             ),
         ]);
@@ -148,6 +151,43 @@ class OutcomeController extends Controller
         /* } */
         /* // 5. Redirect back with preserved filters */
         /* return redirect()->route('outcomes', $filters)->with('success', 'Added outcome!'); */
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Outcome $outcome)
+    {
+        // 1. Authorize: Check xem khoản chi này có phải của ông đang login không
+        if ($outcome->user_id !== auth()->id()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Định xem trộm ví người khác hả bro? Không được nha!',
+            ], 403);
+        }
+
+        // 2. Eager load: Lấy luôn thông tin hũ liên quan
+        $outcome->load('jar:id,name');
+
+        // 3. Transform data: Format lại cho React dùng cho sướng
+        $data = [
+            'id' => $outcome->id,
+            'date' => $outcome->date,
+            'category' => $outcome->category,
+            'description' => $outcome->description,
+            'amount' => (float) $outcome->amount,
+            'formatted_amount' => number_format($outcome->amount, 0, ',', '.') . ' ₫',
+            'jar' => [
+                'id' => $outcome->jar->id ?? null,
+                'name' => $outcome->jar->name ?? 'None',
+            ],
+            'created_at' => $outcome->created_at->format('Y-m-d H:i:s'),
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
     }
 
     /**
