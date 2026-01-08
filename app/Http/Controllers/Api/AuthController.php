@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Traits\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -13,30 +14,36 @@ use Exception;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
+
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => [
-                'required',
-                'confirmed',
-                Rules\Password::default()
-            ],
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => [
+                    'required',
+                    'confirmed',
+                    Rules\Password::default()
+                ],
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+            $token = $user->createToken('auth-token')->plainTextToken;
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 201);
+            return $this->created([
+                'user' => $user,
+                'token' => $token,
+            ], 'User registered successfully');
+        } catch (ValidationException $e) {
+            return $this->error('Invalid credentials', 422, $e->errors());
+        }
     }
 
     public function login(LoginRequest $loginRequest)
@@ -46,33 +53,31 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth-token')->plainTextToken;
 
-            return response()->json([
+            return $this->success([
                 'user' => $user,
                 'token' => $token,
-            ], 200);
+            ], 'Login successfully');
         } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Wrong password or username.',
-                'error' => $e->getMessage()
-            ], 422);
+            return $this->error(
+                'Invalid credentials', 422, $e->errors()
+            );
         } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'LOGIN ERROR: ' . $e->getMessage()
-            ], 500);
+            return $this->error(
+                'Login error: ' . $e->getMessage(),
+                500
+            );
         }
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
+        return $this->success(null, 'Logout successfully');
     }
 
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        return $this->success(['user' => $request->user()], null);
     }
 
     public function forgotPassword(Request $request)

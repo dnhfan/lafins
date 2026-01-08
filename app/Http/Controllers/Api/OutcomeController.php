@@ -7,6 +7,7 @@ use App\Http\Controllers\Concerns\PreservesFilters;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OutcomeStoreRequest;
 use App\Http\Requests\OutcomeUpdateRequest;
+use App\Http\Traits\ApiResponse;
 use App\Models\Jar;
 use App\Models\Outcome;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class OutcomeController extends Controller
 {
     use PreservesFilters;
     use BuildsFinancialQuery;
+    use ApiResponse;
 
     public function __construct()
     {
@@ -82,13 +84,13 @@ class OutcomeController extends Controller
         /* ), */
         /* ]); */
 
-        return response()->json([
+        return $this->success([
             'outcomes' => $outcomes,
             'jars' => $jars,
             'filters' => $this->canonicalizefilters(
                 $request->only(['range', 'start', 'end', 'search', 'sort_by', 'sort_dir', 'page', 'per_page'])
             ),
-        ]);
+        ], 'Outcomes loaded successfully');
     }
 
     /**
@@ -130,18 +132,11 @@ class OutcomeController extends Controller
                 return Outcome::create($validated);
             });
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Added outcome!',
-                'data' => $outcome,
-            ], 201);
+            return $this->created(['outcome' => $outcome], 'Outcome added successfully');
         } catch (\RuntimeException $e) {
             /* $filters = $this->extractFiltersFromReferer($request) ?: ['range' => 'day', 'page' => 1]; */
             /* return redirect()->route('outcomes', $filters)->with('error', $e->getMessage()); */
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ]);
+            return $this->error($e->getMessage(), 400);
         }
 
         /* // 4. Extract filters from referer for preserving state */
@@ -160,10 +155,7 @@ class OutcomeController extends Controller
     {
         // 1. Authorize: Check xem khoản chi này có phải của ông đang login không
         if ($outcome->user_id !== auth()->id()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Định xem trộm ví người khác hả bro? Không được nha!',
-            ], 403);
+            return $this->error('You do not have permission to do this', 403);
         }
 
         // 2. Eager load: Lấy luôn thông tin hũ liên quan
@@ -184,10 +176,7 @@ class OutcomeController extends Controller
             'created_at' => $outcome->created_at->format('Y-m-d H:i:s'),
         ];
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $data
-        ]);
+        return $this->success($data, 'Outcome details loaded');
     }
 
     /**
@@ -198,10 +187,7 @@ class OutcomeController extends Controller
         // 1. Ensure the outcome belongs to the authenticated user
         if ($outcome->user_id !== $request->user()->id) {
             /* abort(403, 'Unauthorized action.'); */
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You do not have permission to do this!',
-            ], 403);
+            return $this->error('You do not have permission to do this', 403);
         }
 
         // 2. Get validated data from the OutcomeUpdateRequest
@@ -239,16 +225,10 @@ class OutcomeController extends Controller
                 $outcome->update($validated);
             });
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Updated outcomes'
-            ]);
+            return $this->success(null, 'Outcome updated successfully');
         } catch (\RuntimeException $e) {
             /* return redirect()->route('outcomes', $filters)->with('error', $e->getMessage()); */
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Error when update outcomes: ' . $e->getMessage()
-            ], 400);
+            return $this->error('Error when updating outcome: ' . $e->getMessage(), 400);
         }
 
         /* // 4. Extract filters from referer for preserving state */
@@ -266,10 +246,7 @@ class OutcomeController extends Controller
         // 1. Ensure the outcome belongs to the authenticated user
         if ($outcome->user_id !== $request->user()->id) {
             /* abort(403, 'Unauthorized action.'); */
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You do not have permission to do this!',
-            ], 403);
+            return $this->error('You do not have permission to do this', 403);
         }
 
         // 2. Refund jar (if any) then delete outcome within a transaction
@@ -284,9 +261,6 @@ class OutcomeController extends Controller
 
         // 4. Redirect back with preserved filters
         /* return redirect()->route('outcomes', $filters)->with('success', 'Deleted outcome!'); */
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Deleted outcomes!',
-        ]);
+        return $this->success(null, 'Outcome deleted successfully');
     }
 }

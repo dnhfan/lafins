@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Jar;
 use Illuminate\Http\JsonResponse as HttpJsonResponse;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class JarsController extends Controller
 {
+    use ApiResponse;
     public function __construct()
     {
         $this->middleware('auth');
@@ -44,12 +46,9 @@ class JarsController extends Controller
         /* 'jars' => $payload, */
         /* ]); */
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'jars' => $payload
-            ]
-        ]);
+        return $this->success([
+            'jars' => $payload
+        ], 'Jars loaded successfully');
     }
 
     /**
@@ -125,10 +124,7 @@ class JarsController extends Controller
         });
 
         /* return redirect()->back()->with('success', 'Jar percentages updated and balances redistributed'); */
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Jar percentages is updated and balances',
-        ]);
+        return $this->success(null, 'Jar percentages updated and balances redistributed');
     }
 
     /**
@@ -155,10 +151,7 @@ class JarsController extends Controller
         });
 
         /* return redirect()->route('jarconfigs')->with('success', 'All financial data reset to defaults'); */
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Jar data is reset to default',
-        ]);
+        return $this->success(null, 'Jar data reset to defaults');
     }
 
     /**
@@ -219,9 +212,6 @@ class JarsController extends Controller
         });
 
         /* return redirect()->route('jarconfigs')->with('success', 'Jar percentages reset to defaults and balances redistributed'); */
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Jar percentages is reseted to default',
-        ]);
+        return $this->success(null, 'Jar percentages reset to defaults and balances redistributed');
     }
 }
