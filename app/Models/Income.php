@@ -36,7 +36,7 @@ class Income extends Model
 
     protected $fillable = [
         'user_id',
-        'amount', 
+        'amount',
         'source',
         'description',
         'date'
@@ -53,20 +53,29 @@ class Income extends Model
     /**
      * Relationships
      */
-    
     // Income thuộc về 1 user
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    public function jar()
+    {
+        return $this->belongsTo(Jar::class);
+    }
+
+    public function splits()
+    {
+        return $this->hasMany(IncomeJarSplit::class);
+    }
+
     /**
      * Scopes
      */
-    
     // Lấy thu nhập trong khoảng thời gian
     public function scopeBetweenDates($query, $startDate, $endDate)
     {
         return $query->whereBetween('date', [$startDate, $endDate]);
     }
 }
+
