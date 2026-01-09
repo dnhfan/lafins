@@ -5,6 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $name
+ * @property numeric $percentage
+ * @property numeric $balance
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $full_name
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Outcome> $outcomes
+ * @property-read int|null $outcomes_count
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar hasBalance()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar ofType($type)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar whereBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar wherePercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Jar whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Jar extends Model
 {
     //

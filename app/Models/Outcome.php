@@ -6,6 +6,39 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int|null $jar_id
+ * @property numeric $amount
+ * @property string|null $category
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon $date
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $category_name
+ * @property-read mixed $formatted_amount
+ * @property-read \App\Models\Jar|null $jar
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome betweenDates($startDate, $endDate)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome byCategory($category)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome byMonth($month, $year = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome fromJar($jarId)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome latest()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereCategory($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereJarId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Outcome whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Outcome extends Model
 {
     //
