@@ -560,6 +560,153 @@ Accept: application/json
 
 ---
 
+### 2.5 Dashboard
+
+#### 2.5.1 Get Dashboard Data
+- **Method:** `GET`
+- **URL:** `/api/dashboard`
+- **Headers:**
+  ```
+  Authorization: Bearer {token}
+  Accept: application/json
+  ```
+- **Response (200):**
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "jars": [],
+      "recent_incomes": [],
+      "recent_outcomes": [],
+      "summary": {
+        "total_income": 0,
+        "total_outcome": 0,
+        "net_balance": 0
+      }
+    }
+  }
+  ```
+
+---
+
+### 2.6 Profile Management
+
+#### 2.6.1 Get Profile
+- **Method:** `GET`
+- **URL:** `/api/profile`
+- **Headers:**
+  ```
+  Authorization: Bearer {token}
+  Accept: application/json
+  ```
+- **Response (200):**
+  ```json
+  {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "created_at": "2024-01-01T00:00:00.000000Z"
+  }
+  ```
+
+#### 2.6.2 Update Profile
+- **Method:** `PATCH`
+- **URL:** `/api/profile`
+- **Headers:**
+  ```
+  Authorization: Bearer {token}
+  Content-Type: application/json
+  Accept: application/json
+  ```
+- **Body (JSON):**
+  ```json
+  {
+    "name": "John Smith",
+    "email": "john.smith@example.com"
+  }
+  ```
+- **Response (200):**
+  ```json
+  {
+    "status": "success",
+    "message": "Profile updated successfully",
+    "data": {
+      "id": 1,
+      "name": "John Smith",
+      "email": "john.smith@example.com"
+    }
+  }
+  ```
+
+#### 2.6.3 Delete Profile
+- **Method:** `DELETE`
+- **URL:** `/api/profile`
+- **Headers:**
+  ```
+  Authorization: Bearer {token}
+  Accept: application/json
+  ```
+- **Response (200):**
+  ```json
+  {
+    "status": "success",
+    "message": "Profile deleted successfully"
+  }
+  ```
+- **Warning:** This permanently deletes your account!
+
+---
+
+### 2.7 Password Management
+
+#### 2.7.1 Update Password
+- **Method:** `PUT`
+- **URL:** `/api/settings/password`
+- **Headers:**
+  ```
+  Authorization: Bearer {token}
+  Content-Type: application/json
+  Accept: application/json
+  ```
+- **Body (JSON):**
+  ```json
+  {
+    "current_password": "OldPassword123!",
+    "password": "NewPassword123!",
+    "password_confirmation": "NewPassword123!"
+  }
+  ```
+- **Required Fields:** `current_password`, `password`, `password_confirmation`
+- **Response (200):**
+  ```json
+  {
+    "status": "success",
+    "message": "Password updated successfully"
+  }
+  ```
+
+---
+
+### 2.8 Two-Factor Authentication
+
+#### 2.8.1 Get 2FA Status
+- **Method:** `GET`
+- **URL:** `/api/settings/two-factor`
+- **Headers:**
+  ```
+  Authorization: Bearer {token}
+  Accept: application/json
+  ```
+- **Response (200):**
+  ```json
+  {
+    "enabled": false,
+    "qr_code": null
+  }
+  ```
+
+---
+
 ## 3. Testing Workflow
 
 ### Step 1: Register & Login
@@ -590,7 +737,21 @@ In Postman, for all protected endpoints:
 3. **PUT** `/api/outcomes/{id}` - Update an outcome
 4. **DELETE** `/api/outcomes/{id}` - Delete (refunds jar)
 
-### Step 6: Logout
+### Step 6: Test Dashboard
+1. **GET** `/api/dashboard` - View overview of jars, incomes, outcomes, and summary
+
+### Step 7: Test Profile Management
+1. **GET** `/api/profile` - View profile information
+2. **PATCH** `/api/profile` - Update profile (name, email)
+3. **DELETE** `/api/profile` - Delete account (careful!)
+
+### Step 8: Test Password Change
+1. **PUT** `/api/settings/password` - Change your password
+
+### Step 9: Check 2FA Status
+1. **GET** `/api/settings/two-factor` - Check if 2FA is enabled
+
+### Step 10: Logout
 - **POST** `/api/logout` - Invalidates the current token
 
 ---
@@ -659,6 +820,6 @@ Then use `{{api_url}}/login` in your requests.
 
 ---
 
-**Total Endpoints: 20**
+**Total Endpoints: 26**
 
 ✅ Ready to test!
