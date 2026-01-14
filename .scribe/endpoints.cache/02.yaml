@@ -307,7 +307,7 @@ endpoints:
         name: id
         description: 'The ID of the income.'
         required: true
-        example: 16
+        example: 3
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -325,7 +325,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 16
+      id: 3
       income: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -401,7 +401,7 @@ endpoints:
         name: id
         description: 'The ID of the income.'
         required: true
-        example: 16
+        example: 3
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -419,7 +419,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 16
+      id: 3
       income: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -535,7 +535,7 @@ endpoints:
         name: id
         description: 'The ID of the income.'
         required: true
-        example: 16
+        example: 3
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -553,7 +553,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 16
+      id: 3
       income: 1
     queryParameters: []
     cleanQueryParameters: []
