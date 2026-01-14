@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Exception;
 
+/**
+ * @group Income Management
+ *
+ * APIs for managing income records
+ */
 class IncomeController extends Controller
 {
     use PreservesFilters;
@@ -28,7 +33,43 @@ class IncomeController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * List incomes
+     *
+     * @authenticated
+     *
+     * @queryParam range string Filter by date range (day, week, month, year). Example: day
+     * @queryParam start string Filter start date (YYYY-MM-DD). Example: 2024-01-01
+     * @queryParam end string Filter end date (YYYY-MM-DD). Example: 2024-12-31
+     * @queryParam search string Search in source and description. Example: salary
+     * @queryParam sort_by string Sort by field (date, amount, source). Example: date
+     * @queryParam sort_dir string Sort direction (asc, desc). Example: desc
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Items per page (max 100). Example: 15
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Getted incomes",
+     *   "data": {
+     *     "incomes": {
+     *       "current_page": 1,
+     *       "data": [
+     *         {
+     *           "id": 1,
+     *           "date": "2024-01-15",
+     *           "source": "Salary",
+     *           "description": "Monthly salary",
+     *           "amount": 5000000,
+     *           "formatted_amount": "5.000.000 ₫"
+     *         }
+     *       ],
+     *       "total": 10
+     *     },
+     *     "filters": {
+     *       "range": "day",
+     *       "page": 1
+     *     }
+     *   }
+     * }
      */
     public function index(Request $request)
     {
@@ -72,7 +113,39 @@ class IncomeController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create a new income
+     *
+     * @authenticated
+     *
+     * @bodyParam date date required The income date (YYYY-MM-DD). Example: 2024-01-15
+     * @bodyParam source string required The income source. Example: Salary
+     * @bodyParam description string The income description. Example: Monthly salary
+     * @bodyParam amount numeric required The income amount. Example: 5000000
+     *
+     * @response 201 {
+     *   "status": "success",
+     *   "message": "Added income",
+     *   "data": {
+     *     "income": {
+     *       "id": 1,
+     *       "date": "2024-01-15",
+     *       "source": "Salary",
+     *       "description": "Monthly salary",
+     *       "amount": 5000000
+     *     },
+     *     "filters": {
+     *       "range": "day",
+     *       "page": 1
+     *     }
+     *   }
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "Data invalid",
+     *   "errors": {
+     *     "amount": ["The amount field is required."]
+     *   }
+     * }
      */
     public function store(IncomeStoreRequest $request)
     {
@@ -159,7 +232,34 @@ class IncomeController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update an income
+     *
+     * @authenticated
+     *
+     * @urlParam income integer required The income ID. Example: 1
+     *
+     * @bodyParam date date The income date (YYYY-MM-DD). Example: 2024-01-15
+     * @bodyParam source string The income source. Example: Salary
+     * @bodyParam description string The income description. Example: Monthly salary
+     * @bodyParam amount numeric The income amount. Example: 5000000
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Updated income",
+     *   "data": {
+     *     "income": {
+     *       "id": 1,
+     *       "date": "2024-01-15",
+     *       "source": "Salary",
+     *       "description": "Monthly salary",
+     *       "amount": 5000000
+     *     }
+     *   }
+     * }
+     * @response 403 {
+     *   "status": "error",
+     *   "message": "You do not have the permission to do this"
+     * }
      */
     public function update(IncomeUpdateRequest $request, Income $income)
     {
@@ -195,7 +295,24 @@ class IncomeController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete an income
+     *
+     * @authenticated
+     *
+     * @urlParam income integer required The income ID. Example: 1
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Deleted income"
+     * }
+     * @response 403 {
+     *   "status": "error",
+     *   "message": "You do not have permission to do this"
+     * }
+     * @response 400 {
+     *   "status": "error",
+     *   "message": "Jar NEC has insufficient balance to reverse allocation."
+     * }
      */
     public function destroy(Income $income)
     {
@@ -266,6 +383,38 @@ class IncomeController extends Controller
         /* return redirect()->route('incomes', $filters)->with('success', 'Deleted income'); */
     }
 
+    /**
+     * Get income details
+     *
+     * @authenticated
+     *
+     * @urlParam income integer required The income ID. Example: 1
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Income details loaded",
+     *   "data": {
+     *     "id": 1,
+     *     "date": "2024-01-15",
+     *     "source": "Salary",
+     *     "description": "Monthly salary",
+     *     "amounts": 5000000,
+     *     "formatted_amount": "5.000.000 ₫",
+     *     "splits": [
+     *       {
+     *         "jar_id": 1,
+     *         "jar_name": "NEC",
+     *         "amounts": 2750000
+     *       }
+     *     ],
+     *     "created_at": "2024-01-15 10:30:00"
+     *   }
+     * }
+     * @response 403 {
+     *   "status": "error",
+     *   "message": "You do not have permission to do this"
+     * }
+     */
     public function show(Income $income)
     {
         // 1. Authorize

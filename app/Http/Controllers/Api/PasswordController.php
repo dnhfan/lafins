@@ -9,12 +9,32 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * @group User Password
+ *
+ * API for changing user password
+ */
 class PasswordController extends Controller
 {
     use ApiResponse;
 
     /**
-     * Update the user's password.
+     * Update password
+     *
+     * @authenticated
+     *
+     * @bodyParam current_password string required The current password. Example: OldPassword123!
+     * @bodyParam password string required The new password. Example: NewPassword123!
+     * @bodyParam password_confirmation string required Password confirmation. Example: NewPassword123!
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Password updated"
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "The current password is incorrect."
+     * }
      */
     public function update(Request $request): JsonResponse
     {

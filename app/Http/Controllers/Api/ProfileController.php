@@ -8,12 +8,29 @@ use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * @group User Profile
+ *
+ * APIs for managing user profile
+ */
 class ProfileController extends Controller
 {
     use ApiResponse;
 
     /**
-     * Show the user's profile settings page.
+     * Get user profile
+     *
+     * @authenticated
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Getted user",
+     *   "data": {
+     *     "id": 1,
+     *     "name": "John Doe",
+     *     "email": "john@example.com"
+     *   }
+     * }
      */
     public function show(Request $request): JsonResponse
     {
@@ -21,7 +38,22 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile settings.
+     * Update user profile
+     *
+     * @authenticated
+     *
+     * @bodyParam name string The user's name. Example: John Doe
+     * @bodyParam email string The user's email address. Example: john@example.com
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Updated user",
+     *   "data": {
+     *     "id": 1,
+     *     "name": "John Doe",
+     *     "email": "john@example.com"
+     *   }
+     * }
      */
     public function update(ProfileUpdateRequest $request): JsonResponse
     {
@@ -39,7 +71,22 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Delete user account
+     *
+     * Permanently deletes the user's account and all associated data.
+     *
+     * @authenticated
+     *
+     * @bodyParam password string required Current password for confirmation. Example: Password123!
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Deleted user"
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "The provided password is incorrect."
+     * }
      */
     public function destroy(Request $request): JsonResponse
     {

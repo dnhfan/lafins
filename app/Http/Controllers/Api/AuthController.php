@@ -16,10 +16,43 @@ use Illuminate\Validation\ValidationException;
 use Exception;
 use Str;
 
+/**
+ * @group Authentication
+ *
+ * APIs for user authentication
+ */
 class AuthController extends Controller
 {
     use ApiResponse;
 
+    /**
+     * Register a new user
+     *
+     * @bodyParam name string required The user's name. Example: John Doe
+     * @bodyParam email string required The user's email address. Example: john@example.com
+     * @bodyParam password string required The user's password. Example: Password123!
+     * @bodyParam password_confirmation string required Password confirmation. Example: Password123!
+     *
+     * @response 201 {
+     *   "status": "success",
+     *   "message": "User registered successfully",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com"
+     *     },
+     *     "token": "1|abc123..."
+     *   }
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "Invalid credentials",
+     *   "errors": {
+     *     "email": ["The email has already been taken."]
+     *   }
+     * }
+     */
     public function register(Request $request)
     {
         try {
@@ -50,6 +83,29 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Login user
+     *
+     * @bodyParam email string required The user's email. Example: john@example.com
+     * @bodyParam password string required The user's password. Example: Password123!
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Login successfully",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com"
+     *     },
+     *     "token": "2|xyz789..."
+     *   }
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "Invalid credentials"
+     * }
+     */
     public function login(LoginRequest $loginRequest): JsonResponse
     {
         try {
@@ -73,18 +129,57 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Logout user
+     *
+     * @authenticated
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Logout successfully"
+     * }
+     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
         return $this->success(null, 'Logout successfully');
     }
 
+    /**
+     * Get authenticated user
+     *
+     * @authenticated
+     *
+     * @response {
+     *   "status": "success",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com"
+     *     }
+     *   }
+     * }
+     */
     public function user(Request $request): JsonResponse
     {
         return $this->success(['user' => $request->user()], null);
     }
 
-    // for sending resetPassword link
+    /**
+     * Send password reset link
+     *
+     * @bodyParam email string required The user's email address. Example: john@example.com
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "We have emailed your password reset link!"
+     * }
+     * @response 400 {
+     *   "status": "error",
+     *   "message": "We can't find a user with that email address."
+     * }
+     */
     public function forgotPassword(Request $request): JsonResponse
     {
         $request->validate([
@@ -100,7 +195,23 @@ class AuthController extends Controller
         return $this->error(__($status), 400);
     }
 
-    // for req update pass
+    /**
+     * Reset password
+     *
+     * @bodyParam token string required The password reset token. Example: abc123token
+     * @bodyParam email string required The user's email address. Example: john@example.com
+     * @bodyParam password string required The new password. Example: NewPassword123!
+     * @bodyParam password_confirmation string required Password confirmation. Example: NewPassword123!
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Your password has been reset!"
+     * }
+     * @response 400 {
+     *   "status": "error",
+     *   "message": "This password reset token is invalid."
+     * }
+     */
     public function resetPassword(Request $request)
     {
         // validate

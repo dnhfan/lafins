@@ -13,6 +13,11 @@ use App\Models\Outcome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group Outcome Management
+ *
+ * APIs for managing outcome (expense) records
+ */
 class OutcomeController extends Controller
 {
     use PreservesFilters;
@@ -25,7 +30,49 @@ class OutcomeController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * List outcomes
+     *
+     * @authenticated
+     *
+     * @queryParam range string Filter by date range (day, week, month, year). Example: day
+     * @queryParam start string Filter start date (YYYY-MM-DD). Example: 2024-01-01
+     * @queryParam end string Filter end date (YYYY-MM-DD). Example: 2024-12-31
+     * @queryParam search string Search in category and description. Example: groceries
+     * @queryParam sort_by string Sort by field (date, amount, category). Example: date
+     * @queryParam sort_dir string Sort direction (asc, desc). Example: desc
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Items per page (max 100). Example: 15
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Outcomes loaded successfully",
+     *   "data": {
+     *     "outcomes": {
+     *       "current_page": 1,
+     *       "data": [
+     *         {
+     *           "id": 1,
+     *           "date": "2024-01-15",
+     *           "category": "Food",
+     *           "description": "Groceries",
+     *           "amount": 250000,
+     *           "formatted_amount": "250.000 ₫",
+     *           "jar_id": 1,
+     *           "jar_label": "NEC"
+     *         }
+     *       ]
+     *     },
+     *     "jars": [
+     *       {
+     *         "id": 1,
+     *         "name": "NEC"
+     *       }
+     *     ],
+     *     "filters": {
+     *       "range": "day"
+     *     }
+     *   }
+     * }
      */
     public function index(request $request)
     {
@@ -94,7 +141,34 @@ class OutcomeController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create a new outcome
+     *
+     * @authenticated
+     *
+     * @bodyParam date date required The outcome date (YYYY-MM-DD). Example: 2024-01-15
+     * @bodyParam category string required The outcome category. Example: Food
+     * @bodyParam description string The outcome description. Example: Groceries
+     * @bodyParam amount numeric required The outcome amount. Example: 250000
+     * @bodyParam jar_id integer The jar to deduct from. Example: 1
+     *
+     * @response 201 {
+     *   "status": "success",
+     *   "message": "Outcome added successfully",
+     *   "data": {
+     *     "outcome": {
+     *       "id": 1,
+     *       "date": "2024-01-15",
+     *       "category": "Food",
+     *       "description": "Groceries",
+     *       "amount": 250000,
+     *       "jar_id": 1
+     *     }
+     *   }
+     * }
+     * @response 400 {
+     *   "status": "error",
+     *   "message": "Insufficient balance in selected jar."
+     * }
      */
     public function store(OutcomeStoreRequest $request)
     {
@@ -149,7 +223,33 @@ class OutcomeController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Get outcome details
+     *
+     * @authenticated
+     *
+     * @urlParam outcome integer required The outcome ID. Example: 1
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Outcome details loaded",
+     *   "data": {
+     *     "id": 1,
+     *     "date": "2024-01-15",
+     *     "category": "Food",
+     *     "description": "Groceries",
+     *     "amount": 250000,
+     *     "formatted_amount": "250.000 ₫",
+     *     "jar": {
+     *       "id": 1,
+     *       "name": "NEC"
+     *     },
+     *     "created_at": "2024-01-15 10:30:00"
+     *   }
+     * }
+     * @response 403 {
+     *   "status": "error",
+     *   "message": "You do not have permission to do this"
+     * }
      */
     public function show(Outcome $outcome)
     {
@@ -180,7 +280,30 @@ class OutcomeController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update an outcome
+     *
+     * @authenticated
+     *
+     * @urlParam outcome integer required The outcome ID. Example: 1
+     *
+     * @bodyParam date date The outcome date (YYYY-MM-DD). Example: 2024-01-15
+     * @bodyParam category string The outcome category. Example: Food
+     * @bodyParam description string The outcome description. Example: Groceries
+     * @bodyParam amount numeric The outcome amount. Example: 250000
+     * @bodyParam jar_id integer The jar to deduct from. Example: 1
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Outcome updated successfully"
+     * }
+     * @response 403 {
+     *   "status": "error",
+     *   "message": "You do not have permission to do this"
+     * }
+     * @response 400 {
+     *   "status": "error",
+     *   "message": "Insufficient balance in selected jar."
+     * }
      */
     public function update(OutcomeUpdateRequest $request, Outcome $outcome)
     {
@@ -239,7 +362,20 @@ class OutcomeController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete an outcome
+     *
+     * @authenticated
+     *
+     * @urlParam outcome integer required The outcome ID. Example: 1
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Outcome deleted successfully"
+     * }
+     * @response 403 {
+     *   "status": "error",
+     *   "message": "You do not have permission to do this"
+     * }
      */
     public function destroy(Request $request, Outcome $outcome)
     {

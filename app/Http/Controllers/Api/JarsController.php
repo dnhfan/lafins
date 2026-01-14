@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * @group Jar Management
+ *
+ * APIs for managing jar configurations and balances
+ */
 class JarsController extends Controller
 {
     use ApiResponse;
@@ -20,7 +25,24 @@ class JarsController extends Controller
     }
 
     /**
-     * Show jars configuration page
+     * Get all jars
+     *
+     * @authenticated
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Jars loaded successfully",
+     *   "data": {
+     *     "jars": [
+     *       {
+     *         "id": 1,
+     *         "name": "NEC",
+     *         "percentage": 55,
+     *         "balance": 2750000
+     *       }
+     *     ]
+     *   }
+     * }
      */
     public function index(Request $request)
     {
@@ -42,8 +64,25 @@ class JarsController extends Controller
     }
 
     /**
-     * Bulk update percentages for multiple jars
-     * Expects payload: { percentages: { <jarId>: <percent>, ... } }
+     * Bulk update jar percentages
+     *
+     * Updates multiple jar percentages and redistributes balances accordingly.
+     *
+     * @authenticated
+     *
+     * @bodyParam percentages object required Jar ID to percentage mapping. Example: {"1": 55, "2": 10, "3": 10, "4": 10, "5": 10, "6": 5}
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Jar percentages updated and balances redistributed"
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "Total percentage must be exactly 100%",
+     *   "errors": {
+     *     "percentages": "Total percentage must be 100%"
+     *   }
+     * }
      */
     public function bulkUpdate(Request $request): JsonResponse
     {
@@ -95,7 +134,16 @@ class JarsController extends Controller
     }
 
     /**
-     * Delete all jars for the current user (dangerous)
+     * Delete all jars and financial data
+     *
+     * Deletes all incomes, outcomes, and resets jars to default configuration with zero balances. This action is irreversible.
+     *
+     * @authenticated
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Jar data reset to defaults"
+     * }
      */
     public function deleteAll(Request $request): JsonResponse
     {
@@ -122,7 +170,16 @@ class JarsController extends Controller
     }
 
     /**
-     * Reset jar percentages to configured defaults for the current user (no financial deletions)
+     * Reset jar percentages to defaults
+     *
+     * Resets jar percentages to configured defaults and redistributes balances. Does not delete financial data.
+     *
+     * @authenticated
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Jar percentages reset to defaults and balances redistributed"
+     * }
      */
     public function reset(Request $request): JsonResponse
     {

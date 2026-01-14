@@ -1,0 +1,210 @@
+name: 'Two-Factor Authentication'
+description: |-
+
+  APIs for managing two-factor authentication (2FA)
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/settings/2fa
+    metadata:
+      custom: []
+      groupName: 'Two-Factor Authentication'
+      groupDescription: |-
+
+        APIs for managing two-factor authentication (2FA)
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get 2FA status'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "message": "2FA status retrieved success",
+            "data": {
+              "twoFactorEnabled": false,
+              "pendingConfirmation": false,
+              "requiresConfirmation": true
+            }
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/settings/2fa/enable
+    metadata:
+      custom: []
+      groupName: 'Two-Factor Authentication'
+      groupDescription: |-
+
+        APIs for managing two-factor authentication (2FA)
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Enable 2FA'
+      description: 'Enables two-factor authentication and generates QR code for setup.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "message": "2FA authentication enable",
+            "data": {
+              "status": "enable",
+              "qr_code_svg": "<svg>...</svg>",
+              "setup_key": "otpauth://...",
+              "secret": "ABC123..."
+            }
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/settings/2fa/confirm
+    metadata:
+      custom: []
+      groupName: 'Two-Factor Authentication'
+      groupDescription: |-
+
+        APIs for managing two-factor authentication (2FA)
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Confirm 2FA setup'
+      description: 'Confirms two-factor authentication setup with verification code.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      code:
+        custom: []
+        name: code
+        description: 'The 2FA verification code.'
+        required: true
+        example: '123456'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      code: '123456'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "message": "2FA auth confirmed"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "status": "error",
+            "message": "The provided two factor authentication code was invalid."
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: api/settings/2fa/disable
+    metadata:
+      custom: []
+      groupName: 'Two-Factor Authentication'
+      groupDescription: |-
+
+        APIs for managing two-factor authentication (2FA)
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Disable 2FA'
+      description: 'Disables two-factor authentication for the user.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "message": "2FA auth disable"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

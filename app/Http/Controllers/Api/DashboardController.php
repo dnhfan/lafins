@@ -13,14 +13,57 @@ use App\Services\DateRangeService;
 use Illuminate\Http\Request;
 use Exception;
 
+/**
+ * @group Dashboard
+ *
+ * API for dashboard summary and statistics
+ */
 class DashboardController extends Controller
 {
     use PreservesFiltersTrait;
     use ApiResponse;
 
     /**
-     * Show dashboard summary (balance, income, outcome) for a date range.
-     * Accepts optional `start` and `end` query params (YYYY-MM-DD).
+     * Get dashboard summary
+     *
+     * Retrieves financial summary including total balance, income, and outcome for a specified date range, along with jar configurations.
+     *
+     * @authenticated
+     *
+     * @queryParam range string Filter by date range (day, week, month, year). Example: month
+     * @queryParam start string Filter start date (YYYY-MM-DD). Example: 2024-01-01
+     * @queryParam end string Filter end date (YYYY-MM-DD). Example: 2024-12-31
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Dashboard loaded",
+     *   "data": {
+     *     "summary": {
+     *       "total_balance": 5000000,
+     *       "total_income": 6000000,
+     *       "total_outcome": 1000000
+     *     },
+     *     "jars": [
+     *       {
+     *         "id": 1,
+     *         "name": "NEC",
+     *         "percentage": 55,
+     *         "balance": 2750000
+     *       }
+     *     ],
+     *     "jar_meta": {
+     *       "percent_sum": 100,
+     *       "percent_sum_valid": true
+     *     },
+     *     "filters": {
+     *       "range": "month"
+     *     }
+     *   }
+     * }
+     * @response 500 {
+     *   "status": "error",
+     *   "message": "Dashboard load error: ..."
+     * }
      */
     public function index(Request $request)
     {

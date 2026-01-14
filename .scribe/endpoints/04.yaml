@@ -1,0 +1,116 @@
+name: Dashboard
+description: |-
+
+  API for dashboard summary and statistics
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/dashboard
+    metadata:
+      custom: []
+      groupName: Dashboard
+      groupDescription: |-
+
+        API for dashboard summary and statistics
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get dashboard summary'
+      description: 'Retrieves financial summary including total balance, income, and outcome for a specified date range, along with jar configurations.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      range:
+        custom: []
+        name: range
+        description: 'Filter by date range (day, week, month, year).'
+        required: false
+        example: month
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      start:
+        custom: []
+        name: start
+        description: 'Filter start date (YYYY-MM-DD).'
+        required: false
+        example: '2024-01-01'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      end:
+        custom: []
+        name: end
+        description: 'Filter end date (YYYY-MM-DD).'
+        required: false
+        example: '2024-12-31'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      range: month
+      start: '2024-01-01'
+      end: '2024-12-31'
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "status": "success",
+            "message": "Dashboard loaded",
+            "data": {
+              "summary": {
+                "total_balance": 5000000,
+                "total_income": 6000000,
+                "total_outcome": 1000000
+              },
+              "jars": [
+                {
+                  "id": 1,
+                  "name": "NEC",
+                  "percentage": 55,
+                  "balance": 2750000
+                }
+              ],
+              "jar_meta": {
+                "percent_sum": 100,
+                "percent_sum_valid": true
+              },
+              "filters": {
+                "range": "month"
+              }
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 500
+        content: |-
+          {
+            "status": "error",
+            "message": "Dashboard load error: ..."
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
