@@ -47,20 +47,19 @@ class Jar extends Model
      * Data casting
      */
     protected $casts = [
-        'percentage' => 'decimal:2',
-        'balance' => 'decimal:2',
+        'percentage' => 'float',
+        'balance' => 'float',
     ];
 
     /**
      * Relationships
      */
-    
     // Jar thuộc về 1 user
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    
+
     // 1 Jar có nhiều outcomes (chi tiêu)
     public function outcomes()
     {
@@ -71,24 +70,23 @@ class Jar extends Model
      * Constants cho các loại jar
      */
     const JAR_TYPES = [
-        'NEC' => 'Necessities', // Nhu cầu thiết yếu (55%)
-        'FFA' => 'Financial Freedom Account', // Tài khoản tự do tài chính (10%)
-        'EDU' => 'Education', // Giáo dục (10%)
-        'LTSS' => 'Long Term Saving for Spending', // Tiết kiệm dài hạn (10%)
-        'PLAY' => 'Play', // Giải trí (10%)
-        'GIVE' => 'Give', // Từ thiện (5%)
+        'NEC' => 'Necessities',  // Nhu cầu thiết yếu (55%)
+        'FFA' => 'Financial Freedom Account',  // Tài khoản tự do tài chính (10%)
+        'EDU' => 'Education',  // Giáo dục (10%)
+        'LTSS' => 'Long Term Saving for Spending',  // Tiết kiệm dài hạn (10%)
+        'PLAY' => 'Play',  // Giải trí (10%)
+        'GIVE' => 'Give',  // Từ thiện (5%)
     ];
 
     /**
      * Scopes
      */
-    
     // Lấy jar theo loại
     public function scopeOfType($query, $type)
     {
         return $query->where('name', $type);
     }
-    
+
     // Lấy jar có số dư > 0
     public function scopeHasBalance($query)
     {
@@ -98,20 +96,19 @@ class Jar extends Model
     /**
      * Helper methods
      */
-    
     // Lấy tên đầy đủ của jar
     public function getFullNameAttribute()
     {
         return self::JAR_TYPES[$this->name] ?? $this->name;
     }
-    
+
     // Thêm tiền vào jar
     public function addMoney($amount)
     {
         $this->increment('balance', $amount);
         return $this;
     }
-    
+
     // Trừ tiền khỏi jar
     public function subtractMoney($amount)
     {
@@ -122,3 +119,4 @@ class Jar extends Model
         return false;
     }
 }
+
