@@ -26,24 +26,18 @@ class JarsController extends Controller
     {
         $user = $request->user();
 
-        $totalInput = (float) $request->input('total_amount', 0);
-
         // The database stores jar type in the 'name' column (NEC, FFA, ...).
         // The frontend expects objects with 'label' and 'key' fields. Map accordingly.
         $jars = Jar::where('user_id', $user->id)
             ->orderBy('id')
             ->get();
 
-        $payload = $jars->map(function ($jar) use ($totalInput) {
-            return new JarResource($jar, $totalInput);
-        })->toArray();
-
         /* return Inertia::render('jarconfigs', [ */
         /* 'jars' => $payload, */
         /* ]); */
 
         return $this->success([
-            'jars' => $payload
+            'jars' => JarResource::collection($jars),
         ], 'Jars loaded successfully');
     }
 
@@ -60,16 +54,24 @@ class JarsController extends Controller
             'percentages.*' => ['numeric', 'min:0', 'max:100'],
         ]);
 
+        $percentages = $payload['percentages'];
+
+        // checking percentage before calculate
+        if (abs(array_sum($percentages) - 100) > 0.001) {
+            return $this->error('Total percentage must be exactly 100%', 422, ['percentages' => 'Total percentage must be 100%']);
+        }
+
+        $updatedJars = Jar::where('user_id', $user->id)->whereIn('id', array_keys($percentages))->get();
+
+        if ($updatedJars->count() !== count($percentages)) {
+            return $this->error('Unauthorized or invalid jar IDs', 422);
+        }
+
         // Do updates and redistribution in a transaction
-        DB::transaction(function () use ($user, $payload) {
-            $percentages = $payload['percentages'];
-
-            // Load jars for user
-            $jars = Jar::where('user_id', $user->id)->orderBy('id')->get();
-
+        DB::transaction(function () use ($user, $percentages, $updatedJars) {
             // Update percentages in-memory map
             $jarMap = [];
-            foreach ($jars as $jar) {
+            foreach ($updatedJars as $jar) {
                 if (array_key_exists($jar->id, $percentages)) {
                     $jar->percentage = (float) round($percentages[$jar->id], 2);
                 }
@@ -82,7 +84,10 @@ class JarsController extends Controller
                 $jar->save();
             }
 
-            $this->redistributedBalances($jars);
+            // Take all the Jars
+            $allUserJars = Jar::where('user_id', $user->id)->orderBy('id')->get();
+
+            $this->redistributedBalances($allUserJars);
         });
 
         /* return redirect()->back()->with('success', 'Jar percentages updated and balances redistributed'); */

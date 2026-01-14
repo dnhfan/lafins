@@ -31,7 +31,9 @@ trait ApiResponse
             'message' => $message,
         ];
 
-        if ($error)
+        if ($code === 422 && !$error) {
+            $response['error'] = [];
+        } elseif ($error)
             $response['error'] = $error;
 
         return response()->json($response, $code);

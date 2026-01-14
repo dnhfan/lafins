@@ -7,14 +7,6 @@ use Illuminate\Http\Request;
 
 class JarResource extends JsonResource
 {
-    protected float $totalBalance;
-
-    public function __construct($resource, float $totalBalance = 0)
-    {
-        parent::__construct($resource);
-        $this->totalBalance = $totalBalance;
-    }
-
     /**
      * Transform the resource into an array.
      *
@@ -23,14 +15,15 @@ class JarResource extends JsonResource
     public function toArray(Request $request): array
     {
         $percentage = (float) $this->percentage;
+        $totalBalance = (float) $request->input('total_amount', 0);
 
         return [
             'id' => $this->id,
-            'key' => $this->name,
+            'name' => $this->name,
             'label' => $this->full_name ?? $this->name,
-            'percentage' => $percentage,
-            'balance' => $this->balance,
-            'allocated' => $this->totalBalance > 0 ? round(($percentage / 100) * $this->totalBalance, 2) : 0.0,
+            'percentage' => (float) $percentage,
+            'balance' => (float) $this->balance,
+            'allocated' => $totalBalance > 0 ? round(($percentage / 100) * $totalBalance, 2) : 0.0,
         ];
     }
 }
