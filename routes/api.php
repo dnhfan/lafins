@@ -43,8 +43,11 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::put('/settings/password', [PasswordController::class, 'update']);
 
     // 2FA
-    Route::prefix('settings/two-factor')->group(function () {
+    Route::prefix('settings/2fa')->group(function () {
         Route::get('/', [TwoFactorAuthenticationController::class, 'show']);
+        Route::post('/enable', [TwoFactorAuthenticationController::class, 'store']);
+        Route::post('/confirm', [TwoFactorAuthenticationController::class, 'confirm']);
+        Route::delete('/disable', [TwoFactorAuthenticationController::class, 'destroy']);
     });
 
     Route::controller(ProfileController::class)->prefix('profile')->group(function () {
