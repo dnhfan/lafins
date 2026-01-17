@@ -1,29 +1,28 @@
-
-import React, { useRef, useState } from "react";
-import { Inertia } from '@inertiajs/inertia';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import React, { useRef, useState } from 'react';
 
 export default function SearchBox() {
     // state for open animation
     const [open, setOpen] = useState(false);
 
-   
     const inputRef = useRef<HTMLInputElement | null>(null);
     const btnRef = useRef<HTMLButtonElement | null>(null);
 
     // state for search
     // mirror open state in a ref so rapid clicks can read current value synchronously
     const openRef = useRef<boolean>(false);
-    const { props } = usePage<{ filters?: Record<string, string | number | undefined> }>();
+    const { props } = usePage<{
+        filters?: Record<string, string | number | undefined>;
+    }>();
     // loading indicator while Inertia request is in progress
     const [loading, setLoading] = useState(false);
-    
+
     // funtion for animate
     function animateClick() {
         const btn = btnRef.current;
         if (!btn) return;
-        btn.classList.add("clicked");
-        window.setTimeout(() => btn.classList.remove("clicked"), 420);
+        btn.classList.add('clicked');
+        window.setTimeout(() => btn.classList.remove('clicked'), 420);
     }
 
     // trigger function when click
@@ -49,8 +48,8 @@ export default function SearchBox() {
 
     // handle when press key
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-        // escape 
-        if (e.key === "Escape") {
+        // escape
+        if (e.key === 'Escape') {
             setOpen(false);
             openRef.current = false;
             inputRef.current?.blur();
@@ -64,7 +63,7 @@ export default function SearchBox() {
             // preserve other filters if present (read from top-level props)
             const filters = props?.filters ?? {};
             const data = { ...filters, search: val, page };
-            Inertia.get(window.location.pathname, data, {
+            router.get(window.location.pathname, data, {
                 preserveState: false,
                 preserveScroll: true,
                 // show spinner while request is in flight
@@ -77,9 +76,9 @@ export default function SearchBox() {
     function submitSearch() {
         const val = inputRef.current?.value ?? '';
         const page = 1;
-    const filters = props?.filters ?? {};
+        const filters = props?.filters ?? {};
         const data = { ...filters, search: val, page };
-        Inertia.get(window.location.pathname, data, {
+        router.get(window.location.pathname, data, {
             preserveState: false,
             preserveScroll: true,
             onStart: () => setLoading(true),
@@ -89,7 +88,9 @@ export default function SearchBox() {
 
     // clear search from URL (and input) and reload preserving other filters
     function clearSearch() {
-    const filters = props?.filters ? { ...props.filters } : {} as Record<string, string | number | undefined>;
+        const filters = props?.filters
+            ? { ...props.filters }
+            : ({} as Record<string, string | number | undefined>);
         if (filters.search) delete filters.search;
         const data = { ...filters, page: 1 };
 
@@ -99,7 +100,7 @@ export default function SearchBox() {
         setOpen(false);
         openRef.current = false;
 
-        Inertia.get(window.location.pathname, data, {
+        router.get(window.location.pathname, data, {
             preserveState: false,
             preserveScroll: true,
             onStart: () => setLoading(true),
@@ -108,7 +109,7 @@ export default function SearchBox() {
     }
 
     return (
-        <div className={`search-box ${open ? "open" : ""}`}>
+        <div className={`search-box ${open ? 'open' : ''}`}>
             <button
                 ref={btnRef}
                 type="button"
@@ -133,9 +134,26 @@ export default function SearchBox() {
                 }}
             >
                 {loading ? (
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden>
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" opacity="0.25"></circle>
-                        <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round"></path>
+                    <svg
+                        className="h-4 w-4 animate-spin"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden
+                    >
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            opacity="0.25"
+                        ></circle>
+                        <path
+                            d="M4 12a8 8 0 018-8"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                        ></path>
                     </svg>
                 ) : (
                     <i className="fa-solid fa-search" aria-hidden />
@@ -153,13 +171,15 @@ export default function SearchBox() {
                 onFocus={handleFocus}
                 onKeyDown={handleKeyDown}
             />
-            { open && props && props.filters && props.filters.search ? (
+            {open && props && props.filters && props.filters.search ? (
                 <button
                     type="button"
                     className="search-clear ml-2 text-sm text-muted-foreground"
                     aria-label="Clear search"
                     onClick={clearSearch}
-                    onMouseDown={(e) => { e.preventDefault(); }}
+                    onMouseDown={(e) => {
+                        e.preventDefault();
+                    }}
                     tabIndex={0}
                     role="button"
                 >
