@@ -33,6 +33,28 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Attempt to authenticate the request's credentials.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function authenticate(): User
+    {
+        $this->ensureIsNotRateLimited();
+
+        if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+
+        RateLimiter::clear($this->throttleKey());
+
+        return Auth::user();
+    }
+
+    /**
      * Validate the request's credentials and return the user without logging them in.
      *
      * @throws \Illuminate\Validation\ValidationException
