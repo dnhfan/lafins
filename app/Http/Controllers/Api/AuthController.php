@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rules;
@@ -141,7 +142,21 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $token = $request->user()->currentAccessToken();
+
+        if ($token) {
+            $token->delete();
+        } else {
+            // 1. logout with session
+            Auth::guard('web')->logout();
+
+            // 2. destroy the curr session
+            $request->session()->invalidate();
+
+            // 3. create new token
+            $request->session()->regenerateToken();
+        }
+
         return $this->success(null, 'Logout successfully');
     }
 
