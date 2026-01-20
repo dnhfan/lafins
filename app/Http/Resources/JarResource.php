@@ -21,6 +21,7 @@ class JarResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'label' => $this->full_name ?? $this->name,
+            'key' => $this->name, // Add key field for icon mapping
             'percentage' => (float) $percentage,
             'balance' => (float) $this->balance,
             'allocated' => $totalBalance > 0 ? round(($percentage / 100) * $totalBalance, 2) : 0.0,
