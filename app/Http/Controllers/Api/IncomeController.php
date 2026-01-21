@@ -81,7 +81,7 @@ class IncomeController extends Controller
 
             // default route
             if (!$request->filled('range') && !$request->filled('start') && !$request->filled('end') && !$request->filled('page')) {
-                $request->merge(['range', 'day']);
+                $request->merge(['range' => 'day']);
             }
 
             // 3-6. Apply common filters (range, date, search, sort) via trait
