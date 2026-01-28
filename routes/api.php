@@ -10,6 +10,16 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\TwoFactorAuthenticationController;
 use Illuminate\Support\Facades\Route;
 
+// -- health check --
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'service' => 'lafins-backend',
+        'timestamp' => now()->toIso8601String(),
+        'environment' => app()->environment(),
+    ]);
+});
+
 // -- public routes --
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

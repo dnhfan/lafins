@@ -67,18 +67,21 @@ class AuthController extends Controller
                 ],
             ]);
 
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-            $token = $user->createToken('auth-token')->plainTextToken;
+        $token = $user->createToken('auth-token')->plainTextToken;
 
-            return $this->created([
-                'user' => $user,
-                'token' => $token,
-            ], 'User registered successfully');
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return $this->created([
+            'user' => $user,
+            'token' => $token,
+        ], 'User registered successfully');
         } catch (ValidationException $e) {
             return $this->error('Invalid credentials', 422, $e->errors());
         }
