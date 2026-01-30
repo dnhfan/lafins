@@ -13,12 +13,7 @@ return [
      * | and production domains which access your API via a frontend SPA.
      * |
      */
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,localhost:5173,127.0.0.1:3000,127.0.0.1,127.0.0.1:8000,::1',
-        Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
-    ))),
+    'stateful' => [],
 
     /*
      * |--------------------------------------------------------------------------
@@ -31,7 +26,7 @@ return [
      * | token that's present on an incoming request for authentication.
      * |
      */
-    'guard' => ['web'],
+    'guard' => ['sanctum'],
 
     /*
      * |--------------------------------------------------------------------------
@@ -43,7 +38,7 @@ return [
      * | "expires_at" attribute, but first-party sessions are not affected.
      * |
      */
-    'expiration' => null,
+    'expiration' => env('SANCTUM_EXPIRATION', 43200),
 
     /*
      * |--------------------------------------------------------------------------
