@@ -86,6 +86,9 @@ Route::name('api.')->middleware(['auth:sanctum', 'throttle:api'])->group(functio
             Route::post('/confirm', [TwoFactorAuthenticationController::class, 'confirm']);
             Route::delete('/disable', [TwoFactorAuthenticationController::class, 'destroy']);
 
+            Route::get('/qr-code', [TwoFactorAuthenticationController::class, 'showQrCode']);
+            Route::get('/secret-key', [TwoFactorAuthenticationController::class, 'showSecretKey']);
+
             Route::post('/recovery-codes', [TwoFactorAuthenticationController::class, 'regenerateRecoveryCodes']);
             Route::post('/recovery-codes/show', [TwoFactorAuthenticationController::class, 'recoveryCodes']);
         });

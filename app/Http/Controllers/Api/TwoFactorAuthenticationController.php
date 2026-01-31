@@ -190,4 +190,18 @@ class TwoFactorAuthenticationController extends Controller
             'recovery_codes' => json_decode(decrypt($request->user()->two_factor_recovery_codes), true)
         ], 'Recovery codes regenerated');
     }
+
+    public function showQrCode(Request $request)
+    {
+        return response()->json([
+            'svg' => $request->user()->twoFactorQrCodeSvg()
+        ]);
+    }
+
+    public function showSecretKey(Request $request)
+    {
+        return response()->json([
+            'secretKey' => decrypt($request->user()->two_factor_secret)
+        ]);
+    }
 }
