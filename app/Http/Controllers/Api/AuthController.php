@@ -9,11 +9,11 @@ use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
+use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use Exception;
 use Str;
 
@@ -67,21 +67,21 @@ class AuthController extends Controller
                 ],
             ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+            $token = $user->createToken('auth-token')->plainTextToken;
 
-        Auth::login($user);
-        $request->session()->regenerate();
+            /* Auth::login($user); */
+            /* $request->session()->regenerate(); */
 
-        return $this->created([
-            'user' => $user,
-            'token' => $token,
-        ], 'User registered successfully');
+            return $this->created([
+                'user' => $user,
+                'token' => $token,
+            ], 'User registered successfully');
         } catch (ValidationException $e) {
             return $this->error('Invalid credentials', 422, $e->errors());
         }
@@ -105,6 +105,15 @@ class AuthController extends Controller
      *     "token": "2|xyz789..."
      *   }
      * }
+     * @response 200 {
+     *   "status": "success",
+     *   "message": "Two-factor authentication required",
+     *   "data": {
+     *     "requires_2fa": true,
+     *     "temp_token": "2|tempXYZ789shortlived",
+     *     "expires_in": 300
+     *   }
+     * }
      * @response 422 {
      *   "status": "error",
      *   "message": "Invalid credentials"
@@ -113,9 +122,28 @@ class AuthController extends Controller
     public function login(LoginRequest $loginRequest): JsonResponse
     {
         try {
-            $user = $loginRequest->authenticate();
+            $user = $loginRequest->validateCredentials();
 
-            $token = $user->createToken('auth-token')->plainTextToken;
+            $deviceName = $loginRequest->input('device_name', $loginRequest->userAgent() ?? 'Unknown Device');
+
+            // Check if user has 2FA enabled
+            if ($user->hasEnabledTwoFactorAuthentication()) {
+                // Create temporary token with limited scope (5 minutes)
+                $tempToken = $user->createToken(
+                    '2fa-pending',
+                    ['2fa-challenge'],
+                    now()->addMinutes(5)
+                );
+
+                return $this->success([
+                    'requires_2fa' => true,
+                    'temp_token' => $tempToken->plainTextToken,
+                    'expires_in' => 300,
+                ], 'Two-factor authentication required');
+            }
+
+            // Normal login without 2FA
+            $token = $user->createToken($deviceName)->plainTextToken;
 
             return $this->success([
                 'user' => $user,
@@ -134,6 +162,97 @@ class AuthController extends Controller
     }
 
     /**
+     * Verify two-factor authentication code
+     *
+     * @authenticated
+     *
+     * @bodyParam code string The 2FA verification code (6 digits). Example: 123456
+     * @bodyParam recovery_code string Recovery code as alternative to OTP. Example: abc-def-123
+     *
+     * @response {
+     *   "status": "success",
+     *   "message": "Two-factor authentication successful",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com"
+     *     },
+     *     "token": "3|fullaccesstoken30dayvalid"
+     *   }
+     * }
+     * @response 422 {
+     *   "status": "error",
+     *   "message": "Invalid two-factor authentication code"
+     * }
+     */
+    public function twoFactorChallenge(Request $request): JsonResponse
+    {
+        $request->validate([
+            'code' => 'nullable|string',
+            'recovery_code' => 'nullable|string',
+        ]);
+
+        $user = $request->user();
+
+        // Check if using recovery code
+        if ($request->filled('recovery_code')) {
+            $recoveryCode = $this->validateRecoveryCode($user, $request->recovery_code);
+
+            if (!$recoveryCode) {
+                return $this->error('Invalid recovery code', 422);
+            }
+
+            // Replace used recovery code
+            $user->replaceRecoveryCode($recoveryCode);
+        }
+        // Check regular OTP code
+        elseif ($request->filled('code')) {
+            if (!$this->validateTwoFactorCode($user, $request->code)) {
+                return $this->error('Invalid two-factor authentication code', 422);
+            }
+        } else {
+            return $this->error('Please provide either code or recovery_code', 422);
+        }
+
+        // Delete the temp token
+        $request->user()->currentAccessToken()->delete();
+
+        $deviceName = $request->input('device_name', $request->userAgent() ?? 'Unknown Device');
+
+        // Issue full access token
+        $token = $user->createToken($deviceName)->plainTextToken;
+
+        return $this->success([
+            'user' => $user,
+            'token' => $token,
+        ], 'Two-factor authentication successful');
+    }
+
+    /**
+     * Validate the two-factor authentication code.
+     */
+    protected function validateTwoFactorCode(User $user, string $code): bool
+    {
+        $provider = app(TwoFactorAuthenticationProvider::class);
+
+        return $provider->verify(
+            decrypt($user->two_factor_secret),
+            $code
+        );
+    }
+
+    /**
+     * Validate and get the recovery code if valid.
+     */
+    protected function validateRecoveryCode(User $user, string $recoveryCode): ?string
+    {
+        return collect($user->recoveryCodes())->first(function ($code) use ($recoveryCode) {
+            return hash_equals($code, $recoveryCode) ? $code : null;
+        });
+    }
+
+    /**
      * Logout user
      *
      * @authenticated
@@ -145,20 +264,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $token = $request->user()->currentAccessToken();
-
-        if ($token) {
-            $token->delete();
-        } else {
-            // 1. logout with session
-            Auth::guard('web')->logout();
-
-            // 2. destroy the curr session
-            $request->session()->invalidate();
-
-            // 3. create new token
-            $request->session()->regenerateToken();
-        }
+        $request->user()->currentAccessToken()->delete();
 
         return $this->success(null, 'Logout successfully');
     }

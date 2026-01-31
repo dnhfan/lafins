@@ -7,9 +7,11 @@ use App\Http\Requests\Settings\TwoFactorAuthenticationRequest;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
+use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
 use Laravel\Fortify\Features;
 
 /**
@@ -114,7 +116,13 @@ class TwoFactorAuthenticationController extends Controller
         $request->validate(['code' => 'required|string']);
         $confirm($request->user(), $request->input('code'));
 
-        return $this->success(null, '2FA auth confirmed');
+        $user = $request->user();
+
+        $recoveryCodes = [];
+        if ($user->two_factor_recovery_codes) {
+            $recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true);
+        }
+        return $this->success(['recovery_codes' => $recoveryCodes], '2FA auth confirmed');
     }
 
     /**
@@ -131,8 +139,55 @@ class TwoFactorAuthenticationController extends Controller
      */
     public function destroy(Request $request, DisableTwoFactorAuthentication $disable)
     {
+        $request->validate(['password' => 'required|string']);
+
+        if (!Hash::check($request->password, $request->user()->password)) {
+            return $this->error('invalid password', 422);
+        }
+
         $disable($request->user());
 
         return $this->success(null, '2FA auth disable');
+    }
+
+    /**
+     * Get Recovery Codes (Xem lại mã dự phòng)
+     * Cũng cần check password cho chắc ăn
+     */
+    public function recoveryCodes(Request $request): JsonResponse
+    {
+        $request->validate(['password' => 'required']);
+
+        if (!Hash::check($request->password, $request->user()->password)) {
+            return $this->error('Invalid password', 422);
+        }
+
+        $user = $request->user();
+
+        if (!$user->two_factor_recovery_codes) {
+            return $this->error('2FA not enabled', 400);
+        }
+
+        return $this->success([
+            'recovery_codes' => json_decode(decrypt($user->two_factor_recovery_codes), true)
+        ], 'Recovery codes retrieved');
+    }
+
+    /**
+     * Generate New Recovery Codes (Tạo mã mới)
+     */
+    public function regenerateRecoveryCodes(Request $request, GenerateNewRecoveryCodes $generate): JsonResponse
+    {
+        $request->validate(['password' => 'required']);
+
+        if (!Hash::check($request->password, $request->user()->password)) {
+            return $this->error('Invalid password', 422);
+        }
+
+        $generate($request->user());
+
+        return $this->success([
+            'recovery_codes' => json_decode(decrypt($request->user()->two_factor_recovery_codes), true)
+        ], 'Recovery codes regenerated');
     }
 }
