@@ -26,7 +26,7 @@ return [
      * | token that's present on an incoming request for authentication.
      * |
      */
-    'guard' => ['sanctum'],
+    'guard' => ['web'],
 
     /*
      * |--------------------------------------------------------------------------
