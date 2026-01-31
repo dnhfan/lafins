@@ -101,21 +101,21 @@ class OutcomeController extends Controller
         $outcomes = $query->with('jar:id,name')->paginate($perpage)->withquerystring();
 
         // 8. add jar_label to each outcome before transformation
-        $outcomes->getcollection()->transform(function ($outcomes) {
+        $outcomes->getCollection()->transform(function ($outcome) {
             return [
-                'id' => $outcomes->id,
-                'date' => $outcomes->date,
-                'category' => $outcomes->category,
-                'description' => $outcomes->description,
-                'amount' => $outcomes->amount,
+                'id' => $outcome->id,
+                'date' => $outcome->date ? $outcome->date->format('Y-m-d') : null,
+                'category' => $outcome->category,
+                'description' => $outcome->description,
+                'amount' => $outcome->amount,
                 'formatted_amount' => number_format(
-                    $outcomes->amount,
+                    $outcome->amount,
                     0,
                     ',',
                     '.',
                 ) . ' ₫',
-                'jar_id' => $outcomes->jar_id,
-                'jar_label' => $outcomes->jar->name ?? 'none',
+                'jar_id' => $outcome->jar_id,
+                'jar_label' => $outcome->jar->name ?? 'None',
             ];
         });
 
@@ -264,7 +264,7 @@ class OutcomeController extends Controller
         // 3. Transform data: Format lại cho React dùng cho sướng
         $data = [
             'id' => $outcome->id,
-            'date' => $outcome->date,
+            'date' => $outcome->date ? $outcome->date->format('Y-m-d') : null,
             'category' => $outcome->category,
             'description' => $outcome->description,
             'amount' => (float) $outcome->amount,
